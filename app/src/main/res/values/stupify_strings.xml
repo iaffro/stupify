@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings for the Stupify screens (com.eddyizm.tempus.stupify) -->
+<resources>
+    <string name="stupify_login_subtitle">Sign in to stupify.iaffro.com</string>
+    <string name="stupify_login_username">Username</string>
+    <string name="stupify_login_password">Password</string>
+    <string name="stupify_login_sign_in">Sign in</string>
+    <string name="stupify_login_request_access">Request access</string>
+    <string name="stupify_login_other_server">Use another server</string>
+    <string name="stupify_login_empty">Enter your username and password</string>
+    <string name="stupify_login_failed">Wrong username or password</string>
+    <string name="stupify_login_offline">Can\'t reach Stupify. Check your connection.</string>
+    <string name="stupify_request_title">Request access</string>
+    <string name="stupify_request_explain">Ask for a Stupify account. You\'ll get an email with a link to choose your password once it\'s approved.</string>
+    <string name="stupify_request_name">Your name</string>
+    <string name="stupify_request_username">Username you want</string>
+    <string name="stupify_request_email">Email</string>
+    <string name="stupify_request_spotify_email">Spotify email (optional, to import your library)</string>
+    <string name="stupify_request_note">Note (optional)</string>
+    <string name="stupify_request_send">Send request</string>
+    <string name="stupify_request_sent">Request sent. Watch your email for the approval link.</string>
+</resources>

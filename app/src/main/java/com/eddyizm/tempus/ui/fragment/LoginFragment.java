@@ -54,6 +54,7 @@ public class LoginFragment extends Fragment implements ClickCallback {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        if (com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild()) return;
         inflater.inflate(R.menu.login_page_menu, menu);
     }
 
@@ -61,6 +62,11 @@ public class LoginFragment extends Fragment implements ClickCallback {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         activity = (MainActivity) getActivity();
+
+        if (com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild()) {
+            return com.eddyizm.tempus.stupify.StupifyLogin.createView(this, inflater, container,
+                    () -> activity.goFromLogin(), this::openServerSetup);
+        }
 
         loginViewModel = new ViewModelProvider(requireActivity()).get(LoginViewModel.class);
         bind = FragmentLoginBinding.inflate(inflater, container, false);
@@ -124,13 +130,15 @@ public class LoginFragment extends Fragment implements ClickCallback {
         });
 
         /* Setup button */
-        bind.newLoginButton.setOnClickListener(v -> {
-            Intent tempus = new Intent(requireActivity(), LoginActivity.class);
-            tempus.putExtra("HIDE_TAB_LAYOUT", true);
-            tempus.putExtra("HIDE_TOPAPPBAR_LAYOUT", false);
-            tempus.putExtra("SELECT_FRAGMENT", 3);
-            startActivity(tempus);
-        });
+        bind.newLoginButton.setOnClickListener(v -> openServerSetup());
+    }
+
+    private void openServerSetup() {
+        Intent tempus = new Intent(requireActivity(), LoginActivity.class);
+        tempus.putExtra("HIDE_TAB_LAYOUT", true);
+        tempus.putExtra("HIDE_TOPAPPBAR_LAYOUT", false);
+        tempus.putExtra("SELECT_FRAGMENT", 3);
+        startActivity(tempus);
     }
 
     @Override

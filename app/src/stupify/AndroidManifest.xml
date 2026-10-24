@@ -2,4 +2,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- in-app updates from stupify.iaffro.com (StupifyUpdater) -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <application>
+        <activity android:name="com.eddyizm.tempus.ui.activity.MainActivity">
+            <!-- stupify://login?u=<username>: the welcome page's "Open Stupify" link (StupifyLogin) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="login"
+                    android:scheme="stupify" />
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>
