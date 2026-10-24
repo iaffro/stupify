@@ -14,6 +14,11 @@
         android:orientation="vertical"
         android:paddingBottom="@dimen/global_padding_bottom">
 
+        <!--  Stupify: Made for you  -->
+        <include
+            android:id="@+id/stupify_home"
+            layout="@layout/stupify_home_sector" />
+
         <!--  Download/Sync starred  -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/home_sync_starred_card"

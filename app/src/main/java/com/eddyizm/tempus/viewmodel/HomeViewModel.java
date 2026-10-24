@@ -451,6 +451,9 @@ public class HomeViewModel extends AndroidViewModel {
                 sectors.add(new HomeSector(Constants.HOME_SECTOR_CONTINUE_LISTENING, getApplication().getString(R.string.home_title_continue_listening), true, 2));
                 Preferences.setHomeSectorList(sectors);
             }
+            if (sectors != null && com.eddyizm.tempus.stupify.StupifyHome.addSector(sectors, getApplication().getString(R.string.stupify_home_title))) {
+                Preferences.setHomeSectorList(sectors);
+            }
         }
     }
 

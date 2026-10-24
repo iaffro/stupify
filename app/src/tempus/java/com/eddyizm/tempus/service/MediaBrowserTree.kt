@@ -20,6 +20,8 @@ import com.eddyizm.tempus.R
 import com.eddyizm.tempus.util.ConstantsAA
 import com.eddyizm.tempus.util.Preferences
 import androidx.core.net.toUri
+import com.eddyizm.tempus.stupify.StupifyAuto
+import com.eddyizm.tempus.stupify.StupifyUpdater
 import androidx.media3.session.SessionError
 import com.eddyizm.tempus.util.Preferences.getServerId
 
@@ -249,6 +251,21 @@ object MediaBrowserTree {
                 )
             )
 			
+        if (StupifyUpdater.isStupifyBuild()) {
+            treeNodes[StupifyAuto.MADE_FOR_YOU_ID] =
+                MediaItemNode(
+                    buildMediaItem(
+                        gridView = playlistView,
+                        title = appContext.getString(R.string.stupify_home_title),
+                        mediaId = StupifyAuto.MADE_FOR_YOU_ID,
+                        isPlayable = false,
+                        isBrowsable = true,
+                        imageUri = iconUri(R.drawable.ic_aa_for_you),
+                        mediaType = MediaMetadata.MEDIA_TYPE_FOLDER_PLAYLISTS
+                    )
+                )
+        }
+
         treeNodes[ConstantsAA.PLAYLIST_ID] =
             MediaItemNode(
                 buildMediaItem(
@@ -525,6 +542,8 @@ object MediaBrowserTree {
         }
 
         // Second level for HOME_ID even there is no HOME_ID displayed
+        // Stupify: the server's Made for you playlists come first
+        if (StupifyUpdater.isStupifyBuild()) treeNodes[ConstantsAA.HOME_ID]?.addChild(StupifyAuto.MADE_FOR_YOU_ID)
         // Downloads first: it is the only section that works with no connectivity
         treeNodes[ConstantsAA.HOME_ID]?.addChild(ConstantsAA.DOWNLOADED_ID)
 
@@ -603,6 +622,7 @@ object MediaBrowserTree {
                 ConstantsAA.ARTIST_ID,
                 true)
             ConstantsAA.PLAYLIST_ID -> automotiveRepository.getPlaylists(ConstantsAA.PLAYLIST_ID)
+            StupifyAuto.MADE_FOR_YOU_ID -> StupifyAuto.getPlaylists(ConstantsAA.PLAYLIST_ID)
             ConstantsAA.PODCAST_ID -> automotiveRepository.getNewestPodcastEpisodes(ConstantsAA.NUMBER_OF_DISPLAYED_PODCASTS)
             ConstantsAA.RADIO_ID -> automotiveRepository.getInternetRadioStations()
             ConstantsAA.FOLDER_ID -> automotiveRepository.getMusicFolders(ConstantsAA.FOLDER_ID)

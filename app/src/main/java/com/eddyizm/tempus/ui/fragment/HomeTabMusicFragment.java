@@ -149,6 +149,7 @@ public class HomeTabMusicFragment extends Fragment implements ClickCallback {
         initTopSongsView();
         initPinnedPlaylistsView();
         initSharesView();
+        initStupifyView();
         initHomeReorganizer();
         initMusicFolderChangeListener();
 
@@ -1092,6 +1093,15 @@ public class HomeTabMusicFragment extends Fragment implements ClickCallback {
         recentAddedAlbumSnapHelper.attachToRecyclerView(bind.recentlyAddedAlbumsRecyclerView);
     }
 
+    private void initStupifyView() {
+        if (homeViewModel.checkHomeSectorVisibility(com.eddyizm.tempus.stupify.StupifyHome.SECTOR_ID)) return;
+
+        com.eddyizm.tempus.stupify.StupifyHome.bind(this, bind.stupifyHome,
+                bundle -> { onPlaylistClick(bundle); return kotlin.Unit.INSTANCE; },
+                bundle -> { onPlaylistLongClick(bundle); return kotlin.Unit.INSTANCE; },
+                this::reorder);
+    }
+
     private void initPinnedPlaylistsView() {
         if (homeViewModel.checkHomeSectorVisibility(Constants.HOME_SECTOR_PINNED_PLAYLISTS)) return;
 
@@ -1319,6 +1329,9 @@ public class HomeTabMusicFragment extends Fragment implements ClickCallback {
                     break;
                 case Constants.HOME_SECTOR_SHARED:
                     desired.add(bind.sharesSector);
+                    break;
+                case com.eddyizm.tempus.stupify.StupifyHome.SECTOR_ID:
+                    desired.add(bind.stupifyHome.getRoot());
                     break;
             }
         }

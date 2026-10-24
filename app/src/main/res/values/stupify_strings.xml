@@ -19,4 +19,7 @@
     <string name="stupify_request_note">Note (optional)</string>
     <string name="stupify_request_send">Send request</string>
     <string name="stupify_request_sent">Request sent. Watch your email for the approval link.</string>
+    <string name="stupify_home_title">Made for you</string>
+    <string name="stupify_home_subtitle">Fresh mixes from Stupify, updated every night</string>
+    <string name="stupify_home_songs">%1$d songs</string>
 </resources>

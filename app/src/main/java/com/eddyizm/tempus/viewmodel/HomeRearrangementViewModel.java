@@ -73,6 +73,7 @@ public class HomeRearrangementViewModel extends AndroidViewModel {
         sectors.add(new HomeSector(Constants.HOME_SECTOR_RECENTLY_ADDED, getApplication().getString(R.string.home_title_recently_added), true, 13));
         sectors.add(new HomeSector(Constants.HOME_SECTOR_PINNED_PLAYLISTS, getApplication().getString(R.string.home_title_pinned_playlists), true, 14));
         sectors.add(new HomeSector(Constants.HOME_SECTOR_SHARED, getApplication().getString(R.string.home_title_shares), true, 15));
+        com.eddyizm.tempus.stupify.StupifyHome.addSector(sectors, getApplication().getString(R.string.stupify_home_title));
 
         return sectors;
     }
