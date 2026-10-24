@@ -22,4 +22,12 @@
     <string name="stupify_home_title">Made for you</string>
     <string name="stupify_home_subtitle">Fresh mixes from Stupify, updated every night</string>
     <string name="stupify_home_songs">%1$d songs</string>
+    <string name="stupify_cloud_title">☁ Not in your library yet</string>
+    <string name="stupify_cloud_subtitle">Play one and Stupify adds it in seconds</string>
+    <string name="stupify_cloud_none">Nothing more found outside your library</string>
+    <string name="stupify_cloud_failed">Couldn\'t search outside your library right now</string>
+    <string name="stupify_cloud_song_subtitle">☁ %1$s · %2$s</string>
+    <string name="stupify_cloud_downloading">Adding to your library…</string>
+    <string name="stupify_cloud_ready">✓ In your library · %1$s</string>
+    <string name="stupify_cloud_song_failed">Couldn\'t get this one · %1$s</string>
 </resources>

@@ -128,6 +128,11 @@
 
             </LinearLayout>
 
+            <!--  Stupify: songs not in the library yet  -->
+            <include
+                android:id="@+id/stupify_cloud"
+                layout="@layout/stupify_search_cloud" />
+
             <LinearLayout
                 android:id="@+id/emptyResponseContainer"
                 android:layout_width="match_parent"

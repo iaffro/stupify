@@ -7,7 +7,8 @@ import java.util.UUID;
 public class SubsonicPreferences {
     private String serverUrl;
     private String username;
-    private String clientName = "Tempus";
+    // the Stupify server shows ☁ results apart for its own app (see stupify.StupifySearch)
+    private String clientName = com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild() ? "Stupify" : "Tempus";
     private SubsonicAuthentication authentication;
 
     public String getServerUrl() {

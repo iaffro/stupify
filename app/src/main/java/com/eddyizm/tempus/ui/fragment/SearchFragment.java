@@ -54,6 +54,9 @@ public class SearchFragment extends Fragment implements ClickCallback {
     private AlbumAdapter albumAdapter;
     private SongHorizontalAdapter songHorizontalAdapter;
     private PlaylistHorizontalAdapter playlistHorizontalAdapter;
+    private com.eddyizm.tempus.stupify.StupifySearch stupifySearch;
+    private List<com.eddyizm.tempus.subsonic.models.AlbumID3> libraryAlbums = Collections.emptyList();
+    private List<com.eddyizm.tempus.subsonic.models.AlbumID3> cloudAlbums = Collections.emptyList();
 
     private ListenableFuture<MediaBrowser> mediaBrowserListenableFuture;
 
@@ -137,6 +140,22 @@ public class SearchFragment extends Fragment implements ClickCallback {
 
         playlistHorizontalAdapter = new PlaylistHorizontalAdapter(this);
         bind.allsongsview.setAdapter(playlistHorizontalAdapter);
+
+        if (com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild()) {
+            stupifySearch = new com.eddyizm.tempus.stupify.StupifySearch(this, bind.stupifyCloud,
+                    bundle -> { onMediaClick(bundle); return kotlin.Unit.INSTANCE; },
+                    bundle -> { onMediaLongClick(bundle); return kotlin.Unit.INSTANCE; },
+                    albums -> { cloudAlbums = new java.util.ArrayList<>(albums); showAlbums(); return kotlin.Unit.INSTANCE; });
+        }
+    }
+
+    // library albums first, then ☁ ones (stupify build); either list can arrive first
+    private void showAlbums() {
+        if (bind == null) return;
+        List<com.eddyizm.tempus.subsonic.models.AlbumID3> all = new java.util.ArrayList<>(libraryAlbums);
+        all.addAll(cloudAlbums);
+        albumAdapter.setItems(all);
+        bind.searchAlbumSector.setVisibility(!all.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void initSearchView() {
@@ -245,6 +264,12 @@ public class SearchFragment extends Fragment implements ClickCallback {
         }
     }
     private void performSearch(String query) {
+        if (stupifySearch != null) {
+            libraryAlbums = Collections.emptyList();
+            stupifySearch.search(query, () -> {
+                if (bind != null && stupifySearch.getHasResults()) bind.emptyResponseContainer.setVisibility(View.GONE);
+            });
+        }
         searchViewModel.search3(this, query).observe(getViewLifecycleOwner(), result -> {
             int sectionsThatMatchedTheQuery = 0;
             if (bind != null) {
@@ -258,13 +283,12 @@ public class SearchFragment extends Fragment implements ClickCallback {
                 }
 
                 if (result.getAlbums() != null) {
-                    bind.searchAlbumSector.setVisibility(!result.getAlbums().isEmpty() ? View.VISIBLE : View.GONE);
-                    albumAdapter.setItems(result.getAlbums());
+                    libraryAlbums = result.getAlbums();
                     sectionsThatMatchedTheQuery+=1;
                 } else {
-                    albumAdapter.setItems(Collections.emptyList());
-                    bind.searchAlbumSector.setVisibility(View.GONE);
+                    libraryAlbums = Collections.emptyList();
                 }
+                showAlbums();
 
                 if (result.getSongs() != null) {
                     bind.searchSongSector.setVisibility(!result.getSongs().isEmpty() ? View.VISIBLE : View.GONE);
@@ -275,7 +299,7 @@ public class SearchFragment extends Fragment implements ClickCallback {
                     bind.searchSongSector.setVisibility(View.GONE);
                 }
 
-                if (sectionsThatMatchedTheQuery == 0) {
+                if (sectionsThatMatchedTheQuery == 0 && (stupifySearch == null || !stupifySearch.getHasResults())) {
                     bind.emptyResponseContainer.setVisibility(View.VISIBLE);
                 } else {
                     bind.emptyResponseContainer.setVisibility(View.GONE);
