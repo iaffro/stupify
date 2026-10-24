@@ -731,6 +731,10 @@ public class MainActivity extends BaseActivity {
     }
 
     private void checkTempusUpdate() {
+        if (com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild()) {
+            com.eddyizm.tempus.stupify.StupifyUpdater.check(this);
+            return;
+        }
         if (BuildConfig.FLAVOR.equals("tempus") && Preferences.isGithubUpdateEnabled() && Preferences.showTempusUpdateDialog()) {
             mainViewModel.checkTempusUpdate().observe(this, latestRelease -> {
                 if (latestRelease != null && UpdateUtil.showUpdateDialog(latestRelease)) {

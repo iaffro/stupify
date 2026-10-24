@@ -18,6 +18,8 @@ android {
         versionCode 51
         versionName '4.30.0'
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        buildConfigField "String", "STUPIFY_SERVER", '""'
+        buildConfigField "String", "TEMPUS_BASE", '""'
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -49,6 +51,23 @@ android {
         includeInBundle = false
     }
 
+    // Release keystore lives outside the repo; see stupify/README.md
+    def stupifySigningFile = file(System.getenv("STUPIFY_SIGNING") ?: "${System.getProperty('user.home')}/.stupify_app_keystore.properties")
+    ext.stupifySigning = null
+    if (stupifySigningFile.exists()) {
+        def props = new Properties()
+        stupifySigningFile.withInputStream { props.load(it) }
+        stupifySigning = props
+        signingConfigs {
+            stupify {
+                storeFile = file(props.storeFile)
+                storePassword = props.storePassword
+                keyAlias = props.keyAlias
+                keyPassword = props.keyPassword
+            }
+        }
+    }
+
     flavorDimensions += "default"
 
     productFlavors {
@@ -60,6 +79,26 @@ android {
         degoogled {
             dimension = "default"
             applicationId = "com.eddyizm.degoogled.tempus"
+        }
+
+        // Stupify build: the tempus flavor (Cast + Android Auto) with Stupify branding and hub features
+        stupify {
+            dimension = "default"
+            applicationId = "com.iaffro.stupify"
+            versionCode 1
+            versionName "0.1.0"
+            buildConfigField "String", "STUPIFY_SERVER", '"https://stupify.iaffro.com"'
+            buildConfigField "String", "TEMPUS_BASE", "\"${android.defaultConfig.versionName}\""
+            resourceConfigurations += ["en"]
+            if (stupifySigning != null) signingConfig = signingConfigs.stupify
+        }
+    }
+
+    sourceSets {
+        stupify {
+            java.srcDirs += 'src/tempus/java'
+            kotlin.srcDirs += 'src/tempus/java'
+            res.srcDirs += 'src/tempus/res'
         }
     }
 
@@ -138,6 +177,7 @@ dependencies {
     implementation libs.media3.exoplayer.hls
     implementation libs.media3.datasource.okhttp
     tempusImplementation libs.media3.cast
+    stupifyImplementation libs.media3.cast
 
     // Route picker. Pulled in transitively by the Cast SDK for the tempus flavor
     // already; declared here at the same version so the degoogled flavor has it too.

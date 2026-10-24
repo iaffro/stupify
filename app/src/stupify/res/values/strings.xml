@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stupify branding over the Tempus strings (Tempus is GPL-3.0, github.com/eddyizm/tempus) -->
+<resources>
+    <string name="app_name">Stupify</string>
+    <string name="settings_about_summary">Stupify is the app for stupify.iaffro.com. It is built on Tempus, an open source music client for Subsonic by eddyizm and contributors (GPL-3.0).</string>
+    <string name="settings_audio_transcode_download_priority_summary">If enabled, Stupify will not force download the track with the transcode settings below.</string>
+    <string name="settings_audio_transcode_download_summary">If enabled, Stupify will download transcoded tracks.</string>
+    <string name="settings_audio_transcode_priority_summary">If enabled, Stupify will not force stream the track with the transcode settings below.</string>
+    <string name="asset_link_clipboard_label">Stupify asset link</string>
+    <string name="widget_label">Stupify Widget</string>
+    <string name="widget_placeholder_subtitle">Open Stupify</string>
+    <string name="customactivityoncrash_error_activity_error_occurred_explanation">Stupify crashed.</string>
+    <string name="ca_info_title">Stupify Crashed</string>
+    <string name="la_greeting_description">Welcome to Stupify — your music, plus anything you search for.</string>
+    <string name="settings_lan_remote_summary">Control Stupify on another device, or let one control this device. Listens only while the receiver is on, and searches only when you look for devices.</string>
+</resources>
