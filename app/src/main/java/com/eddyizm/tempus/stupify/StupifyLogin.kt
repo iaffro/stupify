@@ -28,6 +28,7 @@ import org.json.JSONObject
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 
 /**
  * Sign-in screen of the stupify build: the server is built in, so only username and password are asked.
@@ -52,7 +53,7 @@ object StupifyLogin {
         bind.stupifyPassword.setOnEditorActionListener { _, action, _ ->
             if (action == EditorInfo.IME_ACTION_DONE) { signIn(); true } else false
         }
-        bind.stupifyRequestAccess.setOnClickListener { requestAccess(fragment) }
+        bind.stupifyRequestAccess.setOnClickListener { requestAccess(fragment, bind) }
         bind.stupifyOtherServer.setOnClickListener { onOtherServer.run() }
         return bind.root
     }
@@ -91,7 +92,25 @@ object StupifyLogin {
 
             override fun onNetworkFailure(exception: Exception) = failed(R.string.stupify_login_offline)
 
-            override fun onError(exception: Exception) = failed(R.string.stupify_login_failed)
+            override fun onError(exception: Exception) {
+                failed(R.string.stupify_login_failed)
+                // wrong password, or a request that hasn't been approved yet?
+                fragment.lifecycleScope.launch {
+                    val state = withContext(Dispatchers.IO) { runCatching { requestState(user) }.getOrNull() }
+                    val message = when (state) {
+                        "pending" -> R.string.stupify_login_pending
+                        "rejected" -> R.string.stupify_login_rejected
+                        else -> return@launch
+                    }
+                    if (fragment.isAdded) {
+                        MaterialAlertDialogBuilder(fragment.requireActivity())
+                            .setTitle(R.string.stupify_request_title)
+                            .setMessage(fragment.getString(message, user))
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show()
+                    }
+                }
+            }
 
             private fun failed(message: Int) {
                 Preferences.setServerId(null)
@@ -112,7 +131,19 @@ object StupifyLogin {
         bind.stupifyProgress.visibility = if (busy) View.VISIBLE else View.GONE
     }
 
-    private fun requestAccess(fragment: Fragment) {
+    private fun requestState(user: String): String? {
+        val url = URL("${BuildConfig.STUPIFY_SERVER}/app/v1/register/state?username=" + URLEncoder.encode(user, "UTF-8"))
+        val conn = url.openConnection() as HttpURLConnection
+        return try {
+            conn.connectTimeout = 8000
+            conn.readTimeout = 8000
+            JSONObject(conn.inputStream.bufferedReader().readText()).optString("state").takeIf { it.isNotEmpty() && it != "null" }
+        } finally {
+            conn.disconnect()
+        }
+    }
+
+    private fun requestAccess(fragment: Fragment, login: StupifyLoginBinding) {
         val activity = fragment.requireActivity()
         val form = StupifyRequestAccessBinding.inflate(activity.layoutInflater)
         val dialog = MaterialAlertDialogBuilder(activity)
@@ -123,21 +154,34 @@ object StupifyLogin {
             .show()
         val send = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         send.setOnClickListener {
+            val password = form.stupifyReqPassword.text.toString()
+            if (password.length < 8) {
+                Toast.makeText(activity, R.string.stupify_request_password_short, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            if (password != form.stupifyReqPassword2.text.toString()) {
+                Toast.makeText(activity, R.string.stupify_request_password_mismatch, Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            val username = form.stupifyReqUsername.text.toString().trim().lowercase()
             val body = JSONObject()
                 .put("name", form.stupifyReqName.text.toString())
                 .put("username", form.stupifyReqUsername.text.toString())
                 .put("email", form.stupifyReqEmail.text.toString())
                 .put("spotify_email", form.stupifyReqSpotifyEmail.text.toString())
                 .put("note", form.stupifyReqNote.text.toString())
+                .put("password", password)
             send.isEnabled = false
             fragment.lifecycleScope.launch {
                 val error = withContext(Dispatchers.IO) { postRegister(activity, body) }
                 send.isEnabled = true
                 if (error == null) {
                     dialog.dismiss()
+                    login.stupifyUser.setText(username)  // ready to sign in once approved
+                    login.stupifyPassword.setText("")
                     MaterialAlertDialogBuilder(activity)
                         .setTitle(R.string.stupify_request_title)
-                        .setMessage(R.string.stupify_request_sent)
+                        .setMessage(activity.getString(R.string.stupify_request_sent, username))
                         .setPositiveButton(android.R.string.ok, null)
                         .show()
                 } else {

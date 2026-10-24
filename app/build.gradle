@@ -85,8 +85,8 @@ android {
         stupify {
             dimension = "default"
             applicationId = "com.iaffro.stupify"
-            versionCode 5
-            versionName "0.5.0"
+            versionCode 6
+            versionName "0.6.0"
             buildConfigField "String", "STUPIFY_SERVER", '"https://stupify.iaffro.com"'
             buildConfigField "String", "TEMPUS_BASE", "\"${android.defaultConfig.versionName}\""
             resourceConfigurations += ["en"]
