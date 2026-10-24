@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stupify palette: deep navy surfaces, electric blue accent, cyan highlights (replaces Tempus' purple) -->
+<resources>
+    <color name="md_theme_light_primary">#1A5FC4</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#D5E5FF</color>
+    <color name="md_theme_light_onPrimaryContainer">#001C3D</color>
+    <color name="md_theme_light_secondary">#4F5F7A</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#D6E3F8</color>
+    <color name="md_theme_light_onSecondaryContainer">#0B1C33</color>
+    <color name="md_theme_light_tertiary">#006A70</color>
+    <color name="md_theme_light_onTertiary">#FFFFFF</color>
+    <color name="md_theme_light_tertiaryContainer">#9CF0F5</color>
+    <color name="md_theme_light_onTertiaryContainer">#002022</color>
+    <color name="md_theme_light_background">#F7F9FF</color>
+    <color name="md_theme_light_onBackground">#0E1726</color>
+    <color name="md_theme_light_surface">#F7F9FF</color>
+    <color name="md_theme_light_onSurface">#0E1726</color>
+    <color name="md_theme_light_surfaceVariant">#DDE5F2</color>
+    <color name="md_theme_light_onSurfaceVariant">#414B5C</color>
+    <color name="md_theme_light_outline">#6E7A8E</color>
+    <color name="md_theme_light_inverseOnSurface">#ECF1FB</color>
+    <color name="md_theme_light_inverseSurface">#243043</color>
+    <color name="md_theme_light_primaryInverse">#A8CBFF</color>
+
+    <color name="md_theme_dark_primary">#5AA9FF</color>
+    <color name="md_theme_dark_onPrimary">#00264D</color>
+    <color name="md_theme_dark_primaryContainer">#0E3E73</color>
+    <color name="md_theme_dark_onPrimaryContainer">#D4E6FF</color>
+    <color name="md_theme_dark_secondary">#AFC4E4</color>
+    <color name="md_theme_dark_onSecondary">#192C45</color>
+    <color name="md_theme_dark_secondaryContainer">#22344F</color>
+    <color name="md_theme_dark_onSecondaryContainer">#D6E3F8</color>
+    <color name="md_theme_dark_tertiary">#5FE0E6</color>
+    <color name="md_theme_dark_onTertiary">#00373A</color>
+    <color name="md_theme_dark_tertiaryContainer">#004F54</color>
+    <color name="md_theme_dark_onTertiaryContainer">#9CF0F5</color>
+    <color name="md_theme_dark_background">#070D1A</color>
+    <color name="md_theme_dark_onBackground">#E3EAF7</color>
+    <color name="md_theme_dark_surface">#070D1A</color>
+    <color name="md_theme_dark_onSurface">#E3EAF7</color>
+    <color name="md_theme_dark_surfaceVariant">#1D2A42</color>
+    <color name="md_theme_dark_onSurfaceVariant">#B8C4D9</color>
+    <color name="md_theme_dark_outline">#7C89A0</color>
+    <color name="md_theme_dark_inverseOnSurface">#16202F</color>
+    <color name="md_theme_dark_inverseSurface">#E3EAF7</color>
+    <color name="md_theme_dark_primaryInverse">#1A5FC4</color>
+
+    <color name="md_theme_amoled_primary">#5AA9FF</color>
+    <color name="md_theme_amoled_onPrimary">#00264D</color>
+    <color name="md_theme_amoled_primaryContainer">#0E3E73</color>
+    <color name="md_theme_amoled_onPrimaryContainer">#D4E6FF</color>
+    <color name="md_theme_amoled_secondary">#AFC4E4</color>
+    <color name="md_theme_amoled_onSecondary">#192C45</color>
+    <color name="md_theme_amoled_secondaryContainer">#22344F</color>
+    <color name="md_theme_amoled_onSecondaryContainer">#D6E3F8</color>
+    <color name="md_theme_amoled_tertiary">#5FE0E6</color>
+    <color name="md_theme_amoled_onTertiary">#00373A</color>
+    <color name="md_theme_amoled_tertiaryContainer">#004F54</color>
+    <color name="md_theme_amoled_onTertiaryContainer">#9CF0F5</color>
+    <color name="md_theme_amoled_onBackground">#E3EAF7</color>
+    <color name="md_theme_amoled_onSurface">#E3EAF7</color>
+    <color name="md_theme_amoled_onSurfaceVariant">#B8C4D9</color>
+    <color name="md_theme_amoled_inverseSurface">#E3EAF7</color>
+    <color name="md_theme_amoled_primaryInverse">#1A5FC4</color>
+
+    <color name="titleTextColor">#0E1726</color>
+    <color name="subtitleTextColor">#5A6578</color>
+    <color name="dividerColor">#DDE5F2</color>
+
+    <!-- Material 3 surface roles the Tempus palette leaves at the library defaults (StupifySurfaces overlay) -->
+    <color name="stupify_surface_lowest">#FFFFFF</color>
+    <color name="stupify_surface_low">#F0F4FC</color>
+    <color name="stupify_surface_container">#EAF0FA</color>
+    <color name="stupify_surface_high">#E3EAF6</color>
+    <color name="stupify_surface_highest">#DDE5F2</color>
+    <color name="stupify_surface_dim">#D7DEEA</color>
+    <color name="stupify_surface_bright">#F7F9FF</color>
+    <color name="stupify_outline_variant">#C3CCDB</color>
+</resources>

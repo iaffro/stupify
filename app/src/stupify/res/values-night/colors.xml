@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="titleTextColor">#E3EAF7</color>
+    <color name="subtitleTextColor">#8E9BB2</color>
+    <color name="dividerColor">#1F2B40</color>
+
+    <color name="lyricsTextColor">#E3EAF7</color>
+    <color name="shadowsLyricsTextColor">#3B4A66</color>
+
+    <color name="searchPlaceholderColor">#8E9BB2</color>
+    <color name="searchColor">#E3EAF7</color>
+
+    <color name="stupify_surface_lowest">#050A14</color>
+    <color name="stupify_surface_low">#0B1424</color>
+    <color name="stupify_surface_container">#0F1A2E</color>
+    <color name="stupify_surface_high">#142238</color>
+    <color name="stupify_surface_highest">#1A2A44</color>
+    <color name="stupify_surface_dim">#070D1A</color>
+    <color name="stupify_surface_bright">#22314D</color>
+    <color name="stupify_outline_variant">#2A3954</color>
+</resources>

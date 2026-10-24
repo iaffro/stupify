@@ -49,7 +49,8 @@ public class App extends Application {
                 .apply();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        String themePref = sharedPreferences.getString(Preferences.THEME, ThemeHelper.DEFAULT_MODE);
+        String themePref = sharedPreferences.getString(Preferences.THEME,
+                com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild() ? ThemeHelper.DARK_MODE : ThemeHelper.DEFAULT_MODE);
         ThemeHelper.applyTheme(themePref);
 
         instance = new App();

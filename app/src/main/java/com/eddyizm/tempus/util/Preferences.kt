@@ -1,5 +1,7 @@
 package com.eddyizm.tempus.util
 
+import com.eddyizm.tempus.stupify.StupifyUpdater
+
 import android.util.Log
 import androidx.core.content.edit
 import androidx.media3.common.Player
@@ -1254,7 +1256,9 @@ object Preferences {
 
     @JvmStatic
     fun getTheme(): String {
-        return App.getInstance().preferences.getString(THEME, "default") ?: "default"
+        // the stupify build is designed dark-first (navy + blue); light and system stay selectable
+        val fallback = if (StupifyUpdater.isStupifyBuild()) "dark" else "default"
+        return App.getInstance().preferences.getString(THEME, fallback) ?: fallback
     }
 
     @JvmStatic
@@ -1264,7 +1268,8 @@ object Preferences {
 
     @JvmStatic
     fun isDynamicColorAccent(): Boolean {
-        return App.getInstance().preferences.getBoolean(DYNAMIC_COLOR_ACCENT, true)
+        // stupify: its own palette unless the user turns wallpaper colors on
+        return App.getInstance().preferences.getBoolean(DYNAMIC_COLOR_ACCENT, !StupifyUpdater.isStupifyBuild())
     }
 
     @JvmStatic

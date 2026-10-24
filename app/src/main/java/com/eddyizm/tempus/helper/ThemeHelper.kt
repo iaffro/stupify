@@ -1,5 +1,7 @@
 package com.eddyizm.tempus.helper
 
+import com.eddyizm.tempus.stupify.StupifyUpdater
+
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
@@ -120,6 +122,11 @@ object ThemeHelper {
                 }
             }
             else -> Unit
+        }
+
+        // Stupify's own blue palette also needs the newer surface roles the Tempus palette leaves out
+        if (StupifyUpdater.isStupifyBuild() && !isDynamicColorAccent() && !colorAccent.startsWith("HEX:")) {
+            activity.theme.applyStyle(R.style.StupifySurfaces, true)
         }
 
         if (isAmoled) {

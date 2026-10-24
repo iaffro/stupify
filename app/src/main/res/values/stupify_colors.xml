@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Neutral fallbacks for StupifySurfaces; the stupify flavor overrides them with its palette -->
+<resources>
+    <color name="stupify_surface_lowest">#FFFFFF</color>
+    <color name="stupify_surface_low">#F7F2FA</color>
+    <color name="stupify_surface_container">#F3EDF7</color>
+    <color name="stupify_surface_high">#ECE6F0</color>
+    <color name="stupify_surface_highest">#E6E0E9</color>
+    <color name="stupify_surface_dim">#DED8E1</color>
+    <color name="stupify_surface_bright">#FEF7FF</color>
+    <color name="stupify_outline_variant">#CAC4D0</color>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Applied over AppTheme in the stupify build (ThemeHelper) unless the user picked wallpaper colors.
+         The stupify_* colors are defined per flavor; these defaults keep other flavors compiling. -->
+    <style name="StupifySurfaces" parent="">
+        <item name="colorSurfaceContainerLowest">@color/stupify_surface_lowest</item>
+        <item name="colorSurfaceContainerLow">@color/stupify_surface_low</item>
+        <item name="colorSurfaceContainer">@color/stupify_surface_container</item>
+        <item name="colorSurfaceContainerHigh">@color/stupify_surface_high</item>
+        <item name="colorSurfaceContainerHighest">@color/stupify_surface_highest</item>
+        <item name="colorSurfaceDim">@color/stupify_surface_dim</item>
+        <item name="colorSurfaceBright">@color/stupify_surface_bright</item>
+        <item name="colorOutlineVariant">@color/stupify_outline_variant</item>
+    </style>
+</resources>
