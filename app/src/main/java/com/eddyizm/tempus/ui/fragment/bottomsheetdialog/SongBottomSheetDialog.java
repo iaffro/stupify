@@ -343,6 +343,15 @@ public class SongBottomSheetDialog extends BottomSheetDialogFragment implements 
 
         goToArtist.setVisibility(songBottomSheetViewModel.getSong().getArtistId() != null ? View.VISIBLE : View.GONE);
 
+        TextView wrongVersion = view.findViewById(R.id.stupify_wrong_version_text_view);
+        if (com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild()) {
+            wrongVersion.setVisibility(View.VISIBLE);
+            wrongVersion.setOnClickListener(v -> {
+                com.eddyizm.tempus.stupify.StupifyWrongVersion.ask(requireActivity(), songBottomSheetViewModel.getSong());
+                dismissBottomSheet();
+            });
+        }
+
         TextView share = view.findViewById(R.id.share_text_view);
         share.setOnClickListener(v -> songBottomSheetViewModel.shareTrack().observe(getViewLifecycleOwner(), sharedTrack -> {
             if (sharedTrack != null) {

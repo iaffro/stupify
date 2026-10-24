@@ -30,4 +30,10 @@
     <string name="stupify_cloud_downloading">Adding to your library…</string>
     <string name="stupify_cloud_ready">✓ In your library · %1$s</string>
     <string name="stupify_cloud_song_failed">Couldn\'t get this one · %1$s</string>
+    <string name="stupify_wrong_version">Wrong version…</string>
+    <string name="stupify_wrong_version_title">Wrong version?</string>
+    <string name="stupify_wrong_version_explain">If this isn\'t the real \"%1$s\" by %2$s (a cover, a remix, another song), Stupify will look for the right one and swap it in. Your likes and playlists stay.</string>
+    <string name="stupify_wrong_version_note">What\'s wrong? (optional)</string>
+    <string name="stupify_wrong_version_send">Report</string>
+    <string name="stupify_wrong_version_sent">Thanks! Stupify is looking for the right version.</string>
 </resources>

@@ -258,6 +258,8 @@ public class PlayerControllerFragment extends Fragment {
                 if (!com.eddyizm.tempus.lan.LanDevicePicker.isOffered()) {
                     popup.getMenu().removeItem(R.id.action_lan_playback);
                 }
+                popup.getMenu().findItem(R.id.action_stupify_wrong_version)
+                        .setVisible(com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild());
 
                 popup.setOnMenuItemClickListener(item -> {
                     if (item.getItemId() == R.id.action_lan_playback) {
@@ -269,6 +271,10 @@ public class PlayerControllerFragment extends Fragment {
                         return true;
                     } else if (item.getItemId() == R.id.action_add_to_playlist) {
                         openAddToPlaylistDialog();
+                        return true;
+                    } else if (item.getItemId() == R.id.action_stupify_wrong_version) {
+                        var song = playerBottomSheetViewModel.getLiveMedia().getValue();
+                        if (song != null) com.eddyizm.tempus.stupify.StupifyWrongVersion.ask(requireActivity(), song);
                         return true;
                     } else {
                         return false;

@@ -8,4 +8,10 @@
     <item
         android:id="@+id/action_add_to_playlist"
         android:title="@string/player_overflow_menu_add_to_playlist" />
+
+    <!-- stupify build only (PlayerControllerFragment) -->
+    <item
+        android:id="@+id/action_stupify_wrong_version"
+        android:title="@string/stupify_wrong_version"
+        android:visible="false" />
 </menu>
