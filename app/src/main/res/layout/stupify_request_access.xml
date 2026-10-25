@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- "Request access" form; posts to the Stupify server's /app/v1/register -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -37,13 +38,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/stupify_request_username">
+            android:hint="@string/stupify_request_username"
+            app:helperText="@string/stupify_request_username_help"
+            app:helperTextEnabled="true"
+            app:placeholderText="e.g. dina">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/stupify_req_username"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autofillHints="username"
+                android:autofillHints="newUsername"
                 android:inputType="textNoSuggestions|textVisiblePassword" />
         </com.google.android.material.textfield.TextInputLayout>
 

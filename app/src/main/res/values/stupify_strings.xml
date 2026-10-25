@@ -2,7 +2,7 @@
 <!-- Strings for the Stupify screens (com.eddyizm.tempus.stupify) -->
 <resources>
     <string name="stupify_login_subtitle">Sign in to stupify.iaffro.com</string>
-    <string name="stupify_login_username">Username</string>
+    <string name="stupify_login_username">Username or email</string>
     <string name="stupify_login_password">Password</string>
     <string name="stupify_login_sign_in">Sign in</string>
     <string name="stupify_login_request_access">Request access</string>
@@ -13,7 +13,8 @@
     <string name="stupify_request_title">Request access</string>
     <string name="stupify_request_explain">Ask for a Stupify account. Choose your password now; once your request is approved you\'ll get an email and can sign in right away.</string>
     <string name="stupify_request_name">Your name</string>
-    <string name="stupify_request_username">Username you want</string>
+    <string name="stupify_request_username">Choose a username</string>
+    <string name="stupify_request_username_help">You\'ll sign in with it or your email. Best: your first name or a nickname, since family may share your last name.</string>
     <string name="stupify_request_email">Email</string>
     <string name="stupify_request_spotify_email">Spotify email (optional, to import your library)</string>
     <string name="stupify_request_note">Note (optional)</string>

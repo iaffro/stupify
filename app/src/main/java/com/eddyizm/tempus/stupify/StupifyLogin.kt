@@ -31,7 +31,7 @@ import java.net.URL
 import java.net.URLEncoder
 
 /**
- * Sign-in screen of the stupify build: the server is built in, so only username and password are asked.
+ * Sign-in screen of the stupify build: the server is built in, so only username (or email) and password are asked.
  * Replaces the view of Tempus' LoginFragment; "Use another server" opens Tempus' own server setup.
  */
 object StupifyLogin {
@@ -59,12 +59,46 @@ object StupifyLogin {
     }
 
     private fun signIn(fragment: Fragment, bind: StupifyLoginBinding, onSignedIn: Runnable) {
-        val user = bind.stupifyUser.text.toString().trim().lowercase()
+        val login = bind.stupifyUser.text.toString().trim().lowercase()
         val password = bind.stupifyPassword.text.toString()
-        if (user.isEmpty() || password.isEmpty()) {
+        if (login.isEmpty() || password.isEmpty()) {
             Toast.makeText(fragment.context, R.string.stupify_login_empty, Toast.LENGTH_SHORT).show()
             return
         }
+        if ("@" !in login) return signIn(fragment, bind, onSignedIn, login, password)
+        // an email: the hub looks up the username (checking the password), then sign in as usual
+        setBusy(bind, true)
+        fragment.lifecycleScope.launch {
+            val result = withContext(Dispatchers.IO) { runCatching { usernameFor(login, password) } }
+            if (!fragment.isAdded) return@launch
+            val user = result.getOrNull()
+            if (user != null) return@launch signIn(fragment, bind, onSignedIn, user, password)
+            setBusy(bind, false)
+            if (result.isFailure) {
+                Toast.makeText(fragment.context, R.string.stupify_login_offline, Toast.LENGTH_LONG).show()
+                return@launch
+            }
+            val state = withContext(Dispatchers.IO) { runCatching { requestState(login) }.getOrNull() }
+            val message = when (state) {
+                "pending" -> R.string.stupify_login_pending
+                "rejected" -> R.string.stupify_login_rejected
+                else -> null
+            }
+            if (!fragment.isAdded) return@launch
+            if (message == null) {
+                Toast.makeText(fragment.context, R.string.stupify_login_failed, Toast.LENGTH_LONG).show()
+            } else {
+                MaterialAlertDialogBuilder(fragment.requireActivity())
+                    .setTitle(R.string.stupify_request_title)
+                    .setMessage(fragment.getString(message, login))
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show()
+            }
+        }
+    }
+
+    private fun signIn(fragment: Fragment, bind: StupifyLoginBinding, onSignedIn: Runnable,
+                       user: String, password: String) {
         val server = Server(
             serverId = SERVER_ID, serverName = "Stupify", username = user, password = password,
             address = BuildConfig.STUPIFY_SERVER, localAddress = "", timestamp = System.currentTimeMillis(),
@@ -124,6 +158,27 @@ object StupifyLogin {
                 Toast.makeText(fragment.context, message, Toast.LENGTH_LONG).show()
             }
         })
+    }
+
+    /** Username for an email sign-in; null when the email or password is wrong. Throws when the hub can't be reached. */
+    private fun usernameFor(email: String, password: String): String? {
+        val conn = URL(BuildConfig.STUPIFY_SERVER + "/app/v1/sign-in-name").openConnection() as HttpURLConnection
+        return try {
+            conn.connectTimeout = 10000
+            conn.readTimeout = 15000
+            conn.requestMethod = "POST"
+            conn.doOutput = true
+            conn.setRequestProperty("Content-Type", "application/json")
+            val body = JSONObject().put("login", email).put("password", password)
+            conn.outputStream.use { it.write(body.toString().toByteArray()) }
+            when (conn.responseCode) {
+                200 -> JSONObject(conn.inputStream.bufferedReader().readText()).getString("username")
+                401 -> null
+                else -> throw IOException("hub said ${conn.responseCode}")
+            }
+        } finally {
+            conn.disconnect()
+        }
     }
 
     private fun setBusy(bind: StupifyLoginBinding, busy: Boolean) {
