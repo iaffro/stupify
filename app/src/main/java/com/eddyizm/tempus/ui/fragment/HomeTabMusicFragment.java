@@ -1096,7 +1096,7 @@ public class HomeTabMusicFragment extends Fragment implements ClickCallback {
     private void initStupifyView() {
         if (homeViewModel.checkHomeSectorVisibility(com.eddyizm.tempus.stupify.StupifyHome.SECTOR_ID)) return;
 
-        com.eddyizm.tempus.stupify.StupifyHome.bind(this, bind.stupifyHome,
+        com.eddyizm.tempus.stupify.StupifyHome.bind(this, bind.stupifyHome, () -> mediaBrowserListenableFuture,
                 bundle -> { onPlaylistClick(bundle); return kotlin.Unit.INSTANCE; },
                 bundle -> { onPlaylistLongClick(bundle); return kotlin.Unit.INSTANCE; },
                 this::reorder);

@@ -29,6 +29,11 @@
     <string name="stupify_home_title">Made for you</string>
     <string name="stupify_home_subtitle">Fresh mixes from Stupify, updated every night</string>
     <string name="stupify_home_songs">%1$d songs</string>
+    <string name="stupify_dj_title">Stupify DJ</string>
+    <string name="stupify_dj_subtitle">Favourites, new finds and songs you\'ve missed, introduced by your DJ</string>
+    <string name="stupify_dj_warming">Your DJ is getting ready…</string>
+    <string name="stupify_dj_play">Start Stupify DJ</string>
+    <string name="stupify_dj_failed">The DJ couldn\'t start. Check your connection and try again.</string>
     <string name="stupify_cloud_title">☁ Not in your library yet</string>
     <string name="stupify_cloud_subtitle">Play one and Stupify adds it in seconds</string>
     <string name="stupify_cloud_none">Nothing more found outside your library</string>

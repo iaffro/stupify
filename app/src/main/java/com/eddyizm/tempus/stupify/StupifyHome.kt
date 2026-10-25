@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.media3.session.MediaBrowser
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +18,7 @@ import com.eddyizm.tempus.glide.CustomGlideRequest
 import com.eddyizm.tempus.model.HomeSector
 import com.eddyizm.tempus.subsonic.models.Playlist
 import com.eddyizm.tempus.util.Constants
+import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,7 +27,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 
-/** "Made for you" home sector: the Daily Mixes, Discover Weekly etc. the Stupify server builds for the user. */
+/** "Made for you" home sector: Stupify DJ, then the Daily Mixes, Discover Weekly etc. the Stupify server builds for the user. */
 object StupifyHome {
     const val SECTOR_ID = "HOME_SECTOR_STUPIFY"
 
@@ -38,9 +40,19 @@ object StupifyHome {
     }
 
     @JvmStatic
-    fun bind(fragment: Fragment, bind: StupifyHomeSectorBinding, onClick: (Bundle) -> Unit,
-             onLongClick: (Bundle) -> Unit, onChanged: Runnable) {
+    fun bind(fragment: Fragment, bind: StupifyHomeSectorBinding, browser: () -> ListenableFuture<MediaBrowser>?,
+             onClick: (Bundle) -> Unit, onLongClick: (Bundle) -> Unit, onChanged: Runnable) {
         if (!StupifyUpdater.isStupifyBuild()) return
+        bind.root.visibility = View.VISIBLE  // the DJ card is there even before any mixes are built
+        bind.stupifyDjCard.setOnClickListener {
+            if (bind.stupifyDjProgress.visibility == View.VISIBLE) return@setOnClickListener
+            val player = browser() ?: return@setOnClickListener  // created in the fragment's onStart
+            StupifyDj.start(fragment, player) { busy ->
+                bind.stupifyDjProgress.visibility = if (busy) View.VISIBLE else View.GONE
+                bind.stupifyDjPlay.visibility = if (busy) View.INVISIBLE else View.VISIBLE
+                bind.stupifyDjSubtitle.setText(if (busy) R.string.stupify_dj_warming else R.string.stupify_dj_subtitle)
+            }
+        }
         val adapter = CardAdapter(onClick, onLongClick)
         bind.stupifyHomeRecyclerView.layoutManager =
             LinearLayoutManager(fragment.requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -48,7 +60,7 @@ object StupifyHome {
         fragment.viewLifecycleOwner.lifecycleScope.launch {
             val playlists = withContext(Dispatchers.IO) { runCatching { load() }.getOrNull() } ?: return@launch
             adapter.items = playlists
-            bind.root.visibility = if (playlists.isEmpty()) View.GONE else View.VISIBLE
+            bind.stupifyHomeRecyclerView.visibility = if (playlists.isEmpty()) View.GONE else View.VISIBLE
             onChanged.run()
         }
     }

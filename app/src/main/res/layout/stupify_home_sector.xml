@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- "Made for you by Stupify" home sector: the server's generated playlists (StupifyHome) -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/stupify_home_sector"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -24,6 +25,83 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:text="@string/stupify_home_subtitle" />
+
+    <!-- Stupify DJ (StupifyDj): an endless mix with spoken intros -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/stupify_dj_card"
+        style="?attr/materialCardViewFilledStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="14dp">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:contentDescription="@null"
+                android:src="@drawable/stupify_logo" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TitleLarge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stupify_dj_title"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <TextView
+                    android:id="@+id/stupify_dj_subtitle"
+                    style="@style/BodyMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/stupify_dj_subtitle"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp">
+
+                <ImageView
+                    android:id="@+id/stupify_dj_play"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/stupify_dj_play_bg"
+                    android:contentDescription="@string/stupify_dj_play"
+                    android:padding="12dp"
+                    android:src="@drawable/ic_play"
+                    app:tint="?attr/colorOnPrimary" />
+
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    android:id="@+id/stupify_dj_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:indicatorSize="36dp" />
+            </FrameLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/stupify_home_recycler_view"

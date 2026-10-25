@@ -48,6 +48,8 @@ import com.eddyizm.tempus.upnp.UpnpRouteProvider
 import com.eddyizm.tempus.upnp.UpnpRoutesGate
 import com.eddyizm.tempus.ui.activity.MainActivity
 import com.eddyizm.tempus.util.*
+import com.eddyizm.tempus.stupify.StupifyDj
+import com.eddyizm.tempus.stupify.StupifyUpdater
 import com.eddyizm.tempus.util.SleepTimerManager
 import com.eddyizm.tempus.widget.WidgetUpdateManager
 import com.google.common.util.concurrent.FutureCallback
@@ -397,6 +399,7 @@ open class BaseMediaService : MediaLibraryService(), MediaManager.QueueTarget {
 
                 updateWidget(player)
                 QueuePreloader.preload(this@BaseMediaService, player)
+                if (StupifyUpdater.isStupifyBuild()) StupifyDj.onTransition(player)
             }
 
             override fun onTimelineChanged(timeline: Timeline, reason: Int) {
