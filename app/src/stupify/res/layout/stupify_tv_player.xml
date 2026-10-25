@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TV now playing (TvPlayerActivity): big cover left, song + controls right; everything reachable with the D-pad -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/stupify_tv_background"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="96dp"
+    android:paddingEnd="96dp">
+
+    <ImageView
+        android:id="@+id/tv_player_cover"
+        android:layout_width="360dp"
+        android:layout_height="360dp"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="56dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_player_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/stupify_tv_text"
+            android:textSize="40sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_player_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/stupify_tv_text_dim"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/tv_player_album"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/stupify_tv_text_dim"
+            android:textSize="20sp" />
+
+        <ProgressBar
+            android:id="@+id/tv_player_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:layout_marginTop="40dp"
+            android:max="1000"
+            android:progressTint="@color/stupify_tv_accent" />
+
+        <TextView
+            android:id="@+id/tv_player_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/stupify_tv_text_dim"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/tv_player_prev"
+                style="@style/StupifyTvButton"
+                android:contentDescription="@string/stupify_tv_previous"
+                android:src="@drawable/ic_skip_previous" />
+
+            <ImageButton
+                android:id="@+id/tv_player_play"
+                style="@style/StupifyTvButton"
+                android:layout_marginStart="24dp"
+                android:contentDescription="@string/stupify_tv_play_pause"
+                android:src="@drawable/ic_pause" />
+
+            <ImageButton
+                android:id="@+id/tv_player_next"
+                style="@style/StupifyTvButton"
+                android:layout_marginStart="24dp"
+                android:contentDescription="@string/stupify_tv_next"
+                android:src="@drawable/ic_skip_next" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

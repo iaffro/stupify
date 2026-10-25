@@ -73,7 +73,10 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void checkBatteryOptimization() {
-        if (detectBatteryOptimization() && Preferences.askForOptimization()) {
+        // TVs are always plugged in and have no battery settings to open
+        boolean tv = ((android.app.UiModeManager) getSystemService(UI_MODE_SERVICE)).getCurrentModeType()
+                == android.content.res.Configuration.UI_MODE_TYPE_TELEVISION;
+        if (!tv && detectBatteryOptimization() && Preferences.askForOptimization()) {
             showBatteryOptimizationDialog();
         }
     }

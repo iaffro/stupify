@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Stupify TV app (stupify/tv/*): Leanback screens in the Stupify navy/blue -->
+<resources>
+    <color name="stupify_tv_background">#070D1A</color>
+    <color name="stupify_tv_brand">#0D1B33</color>
+    <color name="stupify_tv_card">#13243F</color>
+    <color name="stupify_tv_accent">#5AA9FF</color>
+    <color name="stupify_tv_text">#EAF2FF</color>
+    <color name="stupify_tv_text_dim">#9AABC6</color>
+
+    <string name="stupify_tv_nothing_to_play">Nothing to play here yet</string>
+    <string name="stupify_tv_no_results">Nothing found</string>
+    <string name="stupify_tv_previous">Previous</string>
+    <string name="stupify_tv_next">Next</string>
+    <string name="stupify_tv_play_pause">Play or pause</string>
+    <string name="stupify_tv_nothing_playing">Nothing playing</string>
+
+    <style name="StupifyTvTheme" parent="Theme.Leanback.Browse">
+        <item name="android:windowBackground">@color/stupify_tv_background</item>
+        <item name="android:colorAccent">@color/stupify_tv_accent</item>
+        <item name="defaultBrandColor">@color/stupify_tv_brand</item>
+    </style>
+
+    <style name="StupifyTvSearchTheme" parent="Theme.Leanback">
+        <item name="android:windowBackground">@color/stupify_tv_background</item>
+    </style>
+
+    <style name="StupifyTvPlayerTheme" parent="Theme.Leanback">
+        <item name="android:windowBackground">@color/stupify_tv_background</item>
+    </style>
+
+    <style name="StupifyTvButton">
+        <item name="android:layout_width">88dp</item>
+        <item name="android:layout_height">88dp</item>
+        <item name="android:padding">22dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:background">@drawable/stupify_tv_button_bg</item>
+        <item name="android:tint">@color/stupify_tv_text</item>
+        <item name="android:focusable">true</item>
+    </style>
+</resources>

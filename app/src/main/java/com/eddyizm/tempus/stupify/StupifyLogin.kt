@@ -1,6 +1,10 @@
 package com.eddyizm.tempus.stupify
 
 import android.app.Activity
+import android.app.UiModeManager
+import android.content.Context
+import android.content.Intent
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,12 +40,22 @@ import java.net.URLEncoder
  */
 object StupifyLogin {
     private const val SERVER_ID = "stupify"
+    private const val TV_HOME = "com.eddyizm.tempus.stupify.tv.TvMainActivity"
+
+    private fun isTv(context: Context): Boolean =
+        (context.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager).currentModeType ==
+            Configuration.UI_MODE_TYPE_TELEVISION
 
     @JvmStatic
     fun createView(fragment: Fragment, inflater: LayoutInflater, container: ViewGroup?,
                    onSignedIn: Runnable, onOtherServer: Runnable): View {
         val bind = StupifyLoginBinding.inflate(inflater, container, false)
         val activity = fragment.requireActivity()
+        if (isTv(activity)) {  // a phone-width form in the middle of the TV, not stretched edge to edge
+            val metrics = activity.resources.displayMetrics
+            val side = ((metrics.widthPixels - 640 * metrics.density) / 2).toInt().coerceAtLeast(0)
+            bind.root.setPadding(side, bind.root.paddingTop, side, bind.root.paddingBottom)
+        }
 
         // stupify://login?u=<username> from the welcome page, else the last account used here
         val linked = activity.intent?.data?.takeIf { it.scheme == "stupify" }?.getQueryParameter("u")
@@ -121,7 +135,14 @@ object StupifyLogin {
             override fun onSuccess(password: String?, token: String?, salt: String?) {
                 ServerRepository().insert(server)
                 PlaylistRepository().refreshAllPlaylists()
-                if (fragment.isAdded) onSignedIn.run()
+                if (!fragment.isAdded) return
+                val activity = fragment.requireActivity()
+                if (isTv(activity)) {  // signed in from the TV app: back to its own home screen
+                    activity.startActivity(Intent().setClassName(activity, TV_HOME))
+                    activity.finish()
+                    return
+                }
+                onSignedIn.run()
             }
 
             override fun onNetworkFailure(exception: Exception) = failed(R.string.stupify_login_offline)

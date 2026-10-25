@@ -3,8 +3,40 @@
     <!-- in-app updates from stupify.iaffro.com (StupifyUpdater) -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <application>
+    <!-- Android TV: installable on TVs (no touchscreen), shown on the TV home screen with a banner -->
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
+    <application android:banner="@drawable/stupify_tv_banner">
+        <!-- the TV app (stupify/tv): its own Leanback screens; phones keep MainActivity -->
+        <activity
+            android:name="com.eddyizm.tempus.stupify.tv.TvMainActivity"
+            android:exported="true"
+            android:screenOrientation="landscape"
+            android:theme="@style/StupifyTvTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.eddyizm.tempus.stupify.tv.TvSearchActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/StupifyTvSearchTheme" />
+        <activity
+            android:name="com.eddyizm.tempus.stupify.tv.TvPlayerActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/StupifyTvPlayerTheme" />
+
         <activity android:name="com.eddyizm.tempus.ui.activity.MainActivity">
+
             <!-- stupify://login?u=<username>: the welcome page's "Open Stupify" link (StupifyLogin) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

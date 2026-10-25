@@ -1,9 +1,11 @@
 package com.eddyizm.tempus.stupify
 
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.Player
 import androidx.media3.session.MediaBrowser
@@ -56,9 +58,14 @@ object StupifyDj {
     }
 
     @JvmStatic
-    fun start(fragment: Fragment, browser: ListenableFuture<MediaBrowser>, onBusy: (Boolean) -> Unit) {
+    fun start(fragment: Fragment, browser: ListenableFuture<MediaBrowser>, onBusy: (Boolean) -> Unit) =
+        start(fragment.viewLifecycleOwner, fragment.requireContext().applicationContext, browser, onBusy)
+
+    /** From any screen (the TV app has no Home fragment); [onStarted] runs once the queue is set. */
+    fun start(owner: LifecycleOwner, context: Context, browser: ListenableFuture<MediaBrowser>,
+              onBusy: (Boolean) -> Unit, onStarted: () -> Unit = {}) {
         onBusy(true)
-        fragment.viewLifecycleOwner.lifecycleScope.launch {
+        owner.lifecycleScope.launch {
             val set = withContext(Dispatchers.IO) { runCatching { fetch(start = true) } }
             onBusy(false)
             set.onSuccess { songs ->
@@ -66,9 +73,10 @@ object StupifyDj {
                 djIds += songs.map { it.id }
                 active = true
                 MediaManager.startQueue(browser, songs, 0)
+                onStarted()
             }.onFailure {
                 Log.w(TAG, "DJ start failed", it)
-                if (fragment.isAdded) Toast.makeText(fragment.context, R.string.stupify_dj_failed, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, R.string.stupify_dj_failed, Toast.LENGTH_LONG).show()
             }
         }
     }

@@ -1,5 +1,8 @@
 package com.eddyizm.tempus.stupify
 
+import android.app.AlertDialog
+import android.app.UiModeManager
+import android.content.res.Configuration
 import android.app.DownloadManager
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -44,13 +47,23 @@ object StupifyUpdater {
                 return@launch
             }
             if (activity.isFinishing) return@launch
+            val title = "Stupify ${rel.versionName} is available"
+            val message = rel.changelog.ifBlank { "A new version of Stupify is ready." }
+            val later = { prefs.edit().putLong("snoozed_until", System.currentTimeMillis() + SNOOZE_MS).apply() }
+            val tv = (activity.getSystemService(Context.UI_MODE_SERVICE) as UiModeManager).currentModeType ==
+                Configuration.UI_MODE_TYPE_TELEVISION
+            if (tv) {  // the TV screens use the Leanback theme, where Material dialogs can't be built
+                AlertDialog.Builder(activity).setTitle(title).setMessage(message)
+                    .setPositiveButton("Update") { _, _ -> download(activity, rel) }
+                    .setNegativeButton("Later") { _, _ -> later() }
+                    .show()
+                return@launch
+            }
             MaterialAlertDialogBuilder(activity)
-                .setTitle("Stupify ${rel.versionName} is available")
-                .setMessage(rel.changelog.ifBlank { "A new version of Stupify is ready." })
+                .setTitle(title)
+                .setMessage(message)
                 .setPositiveButton("Update") { _, _ -> download(activity, rel) }
-                .setNegativeButton("Later") { _, _ ->
-                    prefs.edit().putLong("snoozed_until", System.currentTimeMillis() + SNOOZE_MS).apply()
-                }
+                .setNegativeButton("Later") { _, _ -> later() }
                 .show()
         }
     }
