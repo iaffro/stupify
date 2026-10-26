@@ -286,8 +286,16 @@ public class PlayerControllerFragment extends Fragment {
     }
 
     private void initQuickActionView() {
-        playerQuickActionView.setVisibility(Preferences.getQuickActionVisible() ? View.VISIBLE : View.GONE);
+        // Stupify: the row (timer, lyrics, queue) is always shown; Tempus let a long-press on the
+        // format chip hide it, which made the queue easy to lose. Undo that for anyone who hid it.
+        playerQuickActionView.setVisibility(View.VISIBLE);
+        Preferences.setQuickActionVisible(true);
         updateQueueButtonTint(false);
+
+        // the whole icon + label is the touch target
+        bind.getRoot().findViewById(R.id.player_open_queue_container).setOnClickListener(v -> playerOpenQueueButton.performClick());
+        bind.getRoot().findViewById(R.id.player_open_lyrics_container).setOnClickListener(v -> playerOpenLyricsButton.performClick());
+        sleepTimerContainer.setOnClickListener(v -> sleepTimerButton.performClick());
 
         playerOpenQueueButton.setOnClickListener(view -> {
             PlayerBottomSheetFragment playerBottomSheetFragment = (PlayerBottomSheetFragment) requireActivity()
@@ -497,10 +505,8 @@ public class PlayerControllerFragment extends Fragment {
         });
 
         playerMediaExtension.setOnClickListener(v -> toggleBitrateVisibility());
-        playerMediaExtension.setOnLongClickListener(v -> toggleQuickActionVisiblity());
 
         playerMediaBitrate.setOnClickListener(v -> toggleBitrateVisibility());
-        playerMediaBitrate.setOnLongClickListener(v -> toggleQuickActionVisiblity());
     }
 
     private MediaBrowser getBrowser() {
@@ -574,20 +580,6 @@ public class PlayerControllerFragment extends Fragment {
 
         playerMediaBitrate.setVisibility(Preferences.getBitrateVisible() ? View.GONE : View.VISIBLE);
         Preferences.setBitrateVisible(!Preferences.getBitrateVisible());
-    }
-
-    private boolean toggleQuickActionVisiblity() {
-        ViewGroup parent = (ViewGroup) playerQuickActionView.getParent();
-
-        TransitionSet transition = new TransitionSet()
-                .addTransition(new Slide(Gravity.BOTTOM))
-                .addTransition(new ChangeBounds())
-                .setDuration(500)
-                .setInterpolator(new AccelerateDecelerateInterpolator());
-        TransitionManager.beginDelayedTransition(parent, transition);
-        playerQuickActionView.setVisibility(Preferences.getQuickActionVisible() ? View.GONE : View.VISIBLE);
-        Preferences.setQuickActionVisible(!Preferences.getQuickActionVisible());
-        return true;
     }
 
     private void updateAssetLinkChips(MediaMetadata mediaMetadata) {
@@ -829,10 +821,10 @@ public class PlayerControllerFragment extends Fragment {
             ImageViewCompat.setImageTintList(sleepTimerButton,
                     ColorStateList.valueOf(accentColor));
         } else {
-            sleepTimerLabel.setVisibility(View.GONE);
-            sleepTimerLabel.setText("");
+            sleepTimerLabel.setVisibility(View.VISIBLE);
+            sleepTimerLabel.setText(R.string.player_action_sleep_timer);
             int defaultColor = com.google.android.material.color.MaterialColors.getColor(
-                    sleepTimerButton, com.google.android.material.R.attr.colorOnSurface);
+                    sleepTimerButton, com.google.android.material.R.attr.colorPrimary);
             ImageViewCompat.setImageTintList(sleepTimerButton,
                     ColorStateList.valueOf(defaultColor));
         }
@@ -873,9 +865,7 @@ public class PlayerControllerFragment extends Fragment {
     private void updateLyricsButtonTint(boolean isLyricsActive) {
         if (playerOpenLyricsButton == null)
             return;
-        int colorAttr = isLyricsActive
-                ? com.google.android.material.R.attr.colorPrimary
-                : com.google.android.material.R.attr.colorOnSurface;
+        int colorAttr = com.google.android.material.R.attr.colorPrimary;  // Stupify: always accent, like the timer
         int color = com.google.android.material.color.MaterialColors.getColor(playerOpenLyricsButton, colorAttr);
         ImageViewCompat.setImageTintList(playerOpenLyricsButton, ColorStateList.valueOf(color));
     }
@@ -883,9 +873,7 @@ public class PlayerControllerFragment extends Fragment {
     public void updateQueueButtonTint(boolean isQueueActive) {
         if (playerOpenQueueButton == null)
             return;
-        int colorAttr = isQueueActive
-                ? com.google.android.material.R.attr.colorPrimary
-                : com.google.android.material.R.attr.colorOnSurface;
+        int colorAttr = com.google.android.material.R.attr.colorPrimary;  // Stupify: always accent, like the timer
         int color = com.google.android.material.color.MaterialColors.getColor(playerOpenQueueButton, colorAttr);
         ImageViewCompat.setImageTintList(playerOpenQueueButton, ColorStateList.valueOf(color));
     }

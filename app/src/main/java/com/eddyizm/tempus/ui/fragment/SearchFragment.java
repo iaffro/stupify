@@ -271,6 +271,8 @@ public class SearchFragment extends Fragment implements ClickCallback {
             });
         }
         searchViewModel.search3(this, query).observe(getViewLifecycleOwner(), result -> {
+            // Stupify: a failed response (e.g. "wrong username or password") carries no results; don't crash
+            if (result == null) return;
             int sectionsThatMatchedTheQuery = 0;
             if (bind != null) {
                 if (result.getArtists() != null) {

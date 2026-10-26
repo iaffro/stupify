@@ -309,6 +309,9 @@
     <string name="playback_speed_manual_pitch_increase_button_content_description">Increase manual pitch</string>
     <string name="playback_speed_dialog_reset_button">Reset</string>
     <string name="playback_speed_dialog_negative_button">Cancel</string>
+    <string name="player_action_sleep_timer">Sleep timer</string>
+    <string name="player_action_lyrics">Lyrics</string>
+    <string name="player_action_queue">Queue</string>
     <string name="player_queue_clean_all_button">Clean play queue</string>
     <string name="player_queue_save_queue_success">Saved play queue</string>
     <string name="player_queue_save_to_playlist">Save Queue to Playlist</string>

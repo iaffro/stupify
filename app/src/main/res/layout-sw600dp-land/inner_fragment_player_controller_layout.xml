@@ -393,56 +393,100 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_horizontal"
+            android:minWidth="72dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintHorizontal_chainStyle="spread"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/player_open_lyrics_button"
+            app:layout_constraintEnd_toStartOf="@+id/player_open_lyrics_container"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <ImageButton
                 android:id="@+id/player_sleep_timer_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/ic_timer" />
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="6dp"
+                android:background="@null"
+                android:contentDescription="@string/player_action_sleep_timer"
+                app:srcCompat="@drawable/ic_timer"
+                app:tint="?attr/colorPrimary" />
 
+            <!-- "Sleep timer", or the time left while the timer runs -->
             <TextView
                 android:id="@+id/player_sleep_timer_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="9sp"
-                android:text=""
-                android:visibility="gone" />
+                android:textSize="10sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:text="@string/player_action_sleep_timer" />
 
         </LinearLayout>
 
         <!-- Lyrics: -->
-        <ImageButton
-            android:id="@+id/player_open_lyrics_button"
+        <LinearLayout
+            android:id="@+id/player_open_lyrics_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:minWidth="72dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintStart_toEndOf="@+id/player_sleep_timer_container"
-            app:layout_constraintEnd_toStartOf="@+id/player_open_queue_button"
+            app:layout_constraintEnd_toStartOf="@+id/player_open_queue_container"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:srcCompat="@drawable/ic_lyrics" />
+            app:layout_constraintBottom_toBottomOf="parent">
 
+            <ImageButton
+                android:id="@+id/player_open_lyrics_button"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="6dp"
+                android:background="@null"
+                android:contentDescription="@string/player_action_lyrics"
+                app:srcCompat="@drawable/ic_lyrics"
+                app:tint="?attr/colorPrimary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:text="@string/player_action_lyrics" />
+
+        </LinearLayout>
 
         <!-- Queue: last element of the horizontal spread chain -->
-        <ImageButton
-            android:id="@+id/player_open_queue_button"
+        <LinearLayout
+            android:id="@+id/player_open_queue_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:minWidth="72dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:layout_constraintStart_toEndOf="@+id/player_open_lyrics_button"
+            app:layout_constraintStart_toEndOf="@+id/player_open_lyrics_container"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:srcCompat="@drawable/ic_queue" />
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageButton
+                android:id="@+id/player_open_queue_button"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="6dp"
+                android:background="@null"
+                android:contentDescription="@string/player_action_queue"
+                app:srcCompat="@drawable/ic_queue"
+                app:tint="?attr/colorPrimary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:text="@string/player_action_queue" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
