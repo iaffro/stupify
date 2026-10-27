@@ -246,6 +246,7 @@ open class BaseSessionCallback(
         val sessionCommands =
             MediaSession.ConnectionResult.DEFAULT_SESSION_AND_LIBRARY_COMMANDS.buildUpon()
                 .add(SessionCommand(Constants.CUSTOM_COMMAND_PLAY_NEXT, Bundle.EMPTY))
+                .add(SessionCommand(Constants.CUSTOM_COMMAND_APPEND, Bundle.EMPTY))
                 .build()
 
         return MediaSession.ConnectionResult.AcceptedResultBuilder(session)
@@ -454,6 +455,13 @@ open class BaseSessionCallback(
                     args.getInt(Constants.PLAY_NEXT_INSERT_POS, -1),
                     args.getInt(Constants.PLAY_NEXT_COUNT, 0),
                     args.getInt(Constants.PLAY_NEXT_TARGET_COUNT, -1)
+                )
+                Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
+            }
+            Constants.CUSTOM_COMMAND_APPEND -> {
+                service.requestAppendFixup(
+                    args.getInt(Constants.APPEND_COUNT, 0),
+                    args.getInt(Constants.APPEND_TARGET_COUNT, -1)
                 )
                 Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
             }

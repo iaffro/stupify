@@ -202,16 +202,78 @@ open class BaseMediaService : MediaLibraryService(), MediaManager.QueueTarget {
     // arrives after that is dropped instead of reaching a released player.
     override fun livePlayer(): Player? = if (serviceDestroyed) null else mediaLibrarySession.player
 
-    // "Play next" under shuffle: items are inserted at current+1 on the timeline, and the
-    // service splices them into shuffle position current+1. Inserts land asynchronously,
-    // so requests are queued and applied from onTimelineChanged once each target count is visible.
-    private data class PlayNextRequest(val insertPos: Int, val count: Int, val target: Int)
+    // "Play next" / "Add to queue" under shuffle: items are inserted on the timeline (at current+1, or at the
+    // end), and the service splices them into the shuffle order. Inserts land asynchronously, so requests are
+    // queued and applied from onTimelineChanged once each target count is visible.
+    private data class PlayNextRequest(val insertPos: Int, val count: Int, val target: Int, val append: Boolean = false)
     private val playNextQueue = ArrayDeque<PlayNextRequest>()
+
+    // Stupify: the songs the listener queued by hand that have not played yet, in the order they should play
+    // (each is a window uid, so the same song twice in the queue is two different entries). Under shuffle they
+    // come right after the current song, in this order, and only then the shuffled rest of the playlist.
+    private val handQueued = ArrayList<Any>()
 
     override fun requestPlayNextFixup(insertPos: Int, count: Int, target: Int) {
         if (insertPos < 0 || count <= 0 || target < 0) return
         playNextQueue.addLast(PlayNextRequest(insertPos, count, target))
         tryApplyPlayNextFixup()
+    }
+
+    override fun requestAppendFixup(count: Int, target: Int) {
+        if (!StupifyUpdater.isStupifyBuild() || count <= 0 || target < count) return
+        playNextQueue.addLast(PlayNextRequest(target - count, count, target, append = true))
+        tryApplyPlayNextFixup()
+    }
+
+    private fun windowUid(index: Int): Any = exoplayer.currentTimeline.getWindow(index, Timeline.Window()).uid
+
+    /** Forget hand-queued songs that are no longer in the queue (played and removed, or a new queue started). */
+    private fun forgetGoneHandQueued() {
+        val present = (0 until exoplayer.currentTimeline.windowCount).map { windowUid(it) }
+        handQueued.retainAll { uid -> present.any { it === uid } }
+    }
+
+    private fun windowOf(uid: Any): Int =
+        (0 until exoplayer.currentTimeline.windowCount).firstOrNull { windowUid(it) === uid } ?: C.INDEX_UNSET
+
+    /** The current shuffle order, as timeline window indices. */
+    private fun shuffleSequence(): ArrayList<Int> {
+        val timeline = exoplayer.currentTimeline
+        val seq = ArrayList<Int>(timeline.windowCount)
+        var w = timeline.getFirstWindowIndex(true)
+        while (w != C.INDEX_UNSET) {
+            seq.add(w)
+            w = timeline.getNextWindowIndex(w, Player.REPEAT_MODE_OFF, true)
+        }
+        return seq
+    }
+
+    /** The song that just started is no longer "coming up". */
+    private fun handQueuedStarted() {
+        if (!StupifyUpdater.isStupifyBuild() || handQueued.isEmpty()) return
+        val current = exoplayer.currentMediaItemIndex
+        if (current == C.INDEX_UNSET || current >= exoplayer.currentTimeline.windowCount) return
+        val uid = windowUid(current)
+        handQueued.removeAll { it === uid }
+    }
+
+    /** Shuffle was just switched on: the songs queued by hand move to just after the current song, in order. */
+    private fun putHandQueuedFirst() {
+        if (!StupifyUpdater.isStupifyBuild() || !exoplayer.shuffleModeEnabled) return
+        val current = exoplayer.currentMediaItemIndex
+        if (current == C.INDEX_UNSET || exoplayer.currentTimeline.isEmpty) return
+        forgetGoneHandQueued()
+        val queued = handQueued.map { windowOf(it) }.filter { it != C.INDEX_UNSET && it != current }
+        if (queued.isEmpty()) return
+        val seq = shuffleSequence()
+        val curPos = seq.indexOf(current)
+        if (curPos < 0) return
+        val order = ArrayList<Int>(seq.size)
+        order.addAll(seq.subList(0, curPos + 1).filter { it !in queued })
+        order.addAll(queued)
+        order.addAll(seq.subList(curPos + 1, seq.size).filter { it !in queued })
+        exoplayer.shuffleOrder = DefaultShuffleOrder(order.toIntArray(), Random.nextLong())
+        Log.d(TAG, "shuffle on: ${queued.size} hand-queued song(s) kept first, in order")
     }
 
     private fun tryApplyPlayNextFixup() {
@@ -223,23 +285,29 @@ open class BaseMediaService : MediaLibraryService(), MediaManager.QueueTarget {
                 playNextQueue.removeFirst()
                 continue
             }
+            if (req.insertPos + req.count > req.target) {
+                playNextQueue.removeFirst()
+                continue
+            }
+            if (StupifyUpdater.isStupifyBuild()) {            // remember these as queued by hand
+                forgetGoneHandQueued()
+                val added = (req.insertPos until req.insertPos + req.count).map { windowUid(it) }
+                if (req.append) handQueued.addAll(added) else handQueued.addAll(0, added)
+            }
             if (!player.shuffleModeEnabled) {                // timeline == play order; nothing to fix
                 playNextQueue.removeFirst()
                 continue
             }
             val current = player.currentMediaItemIndex
-            if (current == C.INDEX_UNSET || req.insertPos + req.count > req.target) {
+            if (current == C.INDEX_UNSET) {
                 playNextQueue.removeFirst()
                 continue
             }
 
             // Build the current shuffle order minus the new items, then splice them in after current.
-            val timeline = player.currentTimeline
             val base = ArrayList<Int>(req.target)
-            var w = timeline.getFirstWindowIndex(true)
-            while (w != C.INDEX_UNSET) {
+            for (w in shuffleSequence()) {
                 if (w < req.insertPos || w >= req.insertPos + req.count) base.add(w)
-                w = timeline.getNextWindowIndex(w, Player.REPEAT_MODE_OFF, true)
             }
             val curPos = base.indexOf(current)
             if (curPos < 0) {
@@ -247,13 +315,20 @@ open class BaseMediaService : MediaLibraryService(), MediaManager.QueueTarget {
                 continue
             }
 
+            // "Play next" goes straight after the current song; "Add to queue" goes after whatever was already
+            // queued by hand, so the songs the listener queued play in the order they were queued.
+            var at = curPos + 1
+            if (req.append && StupifyUpdater.isStupifyBuild()) {
+                val queuedUids = handQueued.toList()
+                while (at < base.size && queuedUids.any { it === windowUid(base[at]) }) at++
+            }
             val newOrder = ArrayList<Int>(req.target)
             newOrder.addAll(base)
             for (j in 0 until req.count) {
-                newOrder.add(curPos + 1 + j, req.insertPos + j)
+                newOrder.add(at + j, req.insertPos + j)
             }
             player.shuffleOrder = DefaultShuffleOrder(newOrder.toIntArray(), Random.nextLong())
-            Log.d(TAG, "playNextFixup: ${req.count} item(s) moved to shuffle position ${curPos + 1}")
+            Log.d(TAG, "playNextFixup: ${req.count} item(s) moved to shuffle position $at")
             playNextQueue.removeFirst()
         }
     }
@@ -348,6 +423,7 @@ open class BaseMediaService : MediaLibraryService(), MediaManager.QueueTarget {
 
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
                 Log.d(TAG, "onMediaItemTransition" + player.currentMediaItemIndex)
+                handQueuedStarted()
                 if (mediaItem == null) return
                 ReplayGainUtil.applyGain(player, mediaItem)
 
@@ -649,6 +725,7 @@ open class BaseMediaService : MediaLibraryService(), MediaManager.QueueTarget {
 
             override fun onShuffleModeEnabledChanged(shuffleModeEnabled: Boolean) {
                 Preferences.setShuffleModeEnabled(shuffleModeEnabled)
+                if (shuffleModeEnabled) putHandQueuedFirst()  // Stupify: songs queued by hand play first, in order
             }
 
             override fun onRepeatModeChanged(repeatMode: Int) {

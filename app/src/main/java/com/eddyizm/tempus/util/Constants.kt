@@ -149,6 +149,12 @@ object Constants {
     const val PLAY_NEXT_COUNT = "play_next_count"
     const val PLAY_NEXT_TARGET_COUNT = "play_next_target_count"
 
+    // "Add to queue" under shuffle (Stupify): the UI appends the items, then asks the service to put them in the
+    // shuffle order right after the songs already queued by hand, instead of at a random place.
+    const val CUSTOM_COMMAND_APPEND = "com.eddyizm.tempus.APPEND_FIXUP"
+    const val APPEND_COUNT = "append_count"
+    const val APPEND_TARGET_COUNT = "append_target_count"
+
     enum class SeedType {
         ARTIST, ALBUM, TRACK
     }

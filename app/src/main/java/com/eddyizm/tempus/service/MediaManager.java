@@ -74,6 +74,9 @@ public class MediaManager {
         Player livePlayer();
 
         void requestPlayNextFixup(int insertPos, int count, int targetCount);
+
+        /** The last `count` items were just appended (the queue now holds `targetCount`): see Constants.CUSTOM_COMMAND_APPEND. */
+        void requestAppendFixup(int count, int targetCount);
     }
 
     private static QueueTarget queueTargetFor(MediaBrowser browser) {
@@ -81,6 +84,28 @@ public class MediaManager {
             @Override
             public Player livePlayer() {
                 return browser;
+            }
+
+            @Override
+            public void requestAppendFixup(int count, int targetCount) {
+                Bundle args = new Bundle();
+                args.putInt(Constants.APPEND_COUNT, count);
+                args.putInt(Constants.APPEND_TARGET_COUNT, targetCount);
+                ListenableFuture<SessionResult> fixup = browser.sendCustomCommand(
+                        new SessionCommand(Constants.CUSTOM_COMMAND_APPEND, Bundle.EMPTY), args);
+                Futures.addCallback(fixup, new FutureCallback<SessionResult>() {
+                    @Override
+                    public void onSuccess(SessionResult result) {
+                        if (result.resultCode != SessionResult.RESULT_SUCCESS) {
+                            Log.e(TAG, "append fixup rejected with code " + result.resultCode);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.e(TAG, "append fixup command failed", t);
+                    }
+                }, MoreExecutors.directExecutor());
             }
 
             @Override
@@ -434,7 +459,9 @@ public class MediaManager {
             insertPlayNext(queueTarget, player, MappingUtil.mapMediaItems(media));
         } else {
             enqueueDatabase(media, false, player.getMediaItemCount());
+            int target = player.getMediaItemCount() + media.size();
             player.addMediaItems(MappingUtil.mapMediaItems(media));
+            queueTarget.requestAppendFixup(media.size(), target);
         }
     }
 
@@ -453,7 +480,9 @@ public class MediaManager {
                             insertPlayNext(queueTargetFor(browser), browser, Collections.singletonList(MappingUtil.mapMediaItem(media)));
                         } else {
                             enqueueDatabase(media, false, mediaBrowserListenableFuture.get().getMediaItemCount());
+                            int target = browser.getMediaItemCount() + 1;
                             mediaBrowserListenableFuture.get().addMediaItem(MappingUtil.mapMediaItem(media));
+                            queueTargetFor(browser).requestAppendFixup(1, target);
                         }
                     }
                 } catch (ExecutionException | InterruptedException e) {
