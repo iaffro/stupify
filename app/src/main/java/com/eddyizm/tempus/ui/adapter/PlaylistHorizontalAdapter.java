@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class PlaylistHorizontalAdapter extends RecyclerView.Adapter<PlaylistHorizontalAdapter.ViewHolder> implements Filterable {
+public class PlaylistHorizontalAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
     private final ClickCallback click;
 
     private List<Playlist> playlists;
@@ -63,23 +63,58 @@ public class PlaylistHorizontalAdapter extends RecyclerView.Adapter<PlaylistHori
         }
     };
 
+    /** Stupify: one row of cover + name cards (as on the TV) instead of the tall list. */
+    private final boolean compact;
+
     public PlaylistHorizontalAdapter(ClickCallback click) {
+        this(click, false);
+    }
+
+    public PlaylistHorizontalAdapter(ClickCallback click, boolean compact) {
         this.click = click;
+        this.compact = compact;
         this.playlists = Collections.emptyList();
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (compact) {
+            return new ChipHolder(com.eddyizm.tempus.databinding.StupifyItemPlaylistChipBinding
+                    .inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        }
         ItemHorizontalPlaylistBinding view = ItemHorizontalPlaylistBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         Playlist playlist = playlists.get(position);
+        if (viewHolder instanceof ChipHolder) {
+            ChipHolder chip = (ChipHolder) viewHolder;
+            chip.item.stupifyChipTitle.setText(playlist.getName());
+            if (com.eddyizm.tempus.stupify.StupifyHome.LIKED_ID.equals(playlist.getId())) {
+                com.bumptech.glide.Glide.with(chip.itemView).clear(chip.item.stupifyChipCover);
+                chip.item.stupifyChipCover.setImageResource(R.drawable.stupify_liked_cover);
+            } else {
+                CustomGlideRequest.Builder
+                        .from(chip.itemView.getContext(), playlist.getCoverArtId(), CustomGlideRequest.ResourceType.Playlist)
+                        .build()
+                        .into(chip.item.stupifyChipCover);
+            }
+            return;
+        }
+        ViewHolder holder = (ViewHolder) viewHolder;
 
         holder.item.playlistTitleTextView.setText(playlist.getName());
+        if (com.eddyizm.tempus.stupify.StupifyHome.LIKED_ID.equals(playlist.getId())) {
+            holder.item.playlistSubtitleTextView.setText(R.string.stupify_liked_subtitle);
+            com.bumptech.glide.Glide.with(holder.itemView).clear(holder.item.playlistCoverImageView);
+            holder.item.playlistCoverImageView.setImageResource(R.drawable.stupify_liked_cover);
+            holder.item.playlistMoreButton.setVisibility(View.GONE);
+            return;
+        }
+        holder.item.playlistMoreButton.setVisibility(View.VISIBLE);
         holder.item.playlistSubtitleTextView.setText(holder.itemView.getContext().getString(R.string.playlist_counted_tracks, playlist.getSongCount(), MusicUtil.getReadableDurationString(playlist.getDuration(), false)));
 
         CustomGlideRequest.Builder
@@ -106,6 +141,26 @@ public class PlaylistHorizontalAdapter extends RecyclerView.Adapter<PlaylistHori
     @Override
     public Filter getFilter() {
         return filtering;
+    }
+
+    public class ChipHolder extends RecyclerView.ViewHolder {
+        final com.eddyizm.tempus.databinding.StupifyItemPlaylistChipBinding item;
+
+        ChipHolder(com.eddyizm.tempus.databinding.StupifyItemPlaylistChipBinding item) {
+            super(item.getRoot());
+            this.item = item;
+            itemView.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(Constants.PLAYLIST_OBJECT, playlists.get(getBindingAdapterPosition()));
+                click.onPlaylistClick(bundle);
+            });
+            itemView.setOnLongClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(Constants.PLAYLIST_OBJECT, playlists.get(getBindingAdapterPosition()));
+                click.onPlaylistLongClick(bundle);
+                return true;
+            });
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -74,6 +74,8 @@ import com.eddyizm.tempus.viewmodel.PlaybackViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import com.eddyizm.tempus.subsonic.models.Playlist;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -1107,21 +1109,41 @@ public class HomeTabMusicFragment extends Fragment implements ClickCallback {
 
         bind.pinnedPlaylistsRecyclerView.setHasFixedSize(true);
 
-        playlistHorizontalAdapter = new PlaylistHorizontalAdapter(this);
+        boolean stupify = com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild();
+        playlistHorizontalAdapter = new PlaylistHorizontalAdapter(this, stupify);
         bind.pinnedPlaylistsRecyclerView.setAdapter(playlistHorizontalAdapter);
-        homeViewModel.getPinnedPlaylists(getViewLifecycleOwner()).observe(getViewLifecycleOwner(), playlists -> {
+        java.util.function.Consumer<List<Playlist>> showPlaylists = playlists -> {
             if (playlists == null) {
                 if (bind != null) bind.pinnedPlaylistsSector.setVisibility(View.GONE);
             } else {
                 if (bind != null)
                     bind.pinnedPlaylistsSector.setVisibility(!playlists.isEmpty() ? View.VISIBLE : View.GONE);
-                if (bind != null)
+                if (bind != null && stupify)
+                    bind.pinnedPlaylistsRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+                else if (bind != null)
                     bind.pinnedPlaylistsRecyclerView.setLayoutManager(new GridLayoutManager(requireContext(), UIUtil.getSpanCount(playlists.size(), 5), GridLayoutManager.HORIZONTAL, false));
 
                 playlistHorizontalAdapter.setItems(playlists);
             }
+        };
+        homeViewModel.getPinnedPlaylists(getViewLifecycleOwner()).observe(getViewLifecycleOwner(), pinned -> {
+            if (pinned == null || !stupify) {
+                showPlaylists.accept(pinned);
+                return;
+            }
+            // Stupify: the first playlist is always the listener's liked songs, and the generated mixes
+            // are left out (they have their own "Made for you" row)
+            com.eddyizm.tempus.stupify.StupifyHome.withoutMixes(this, pinned, own -> {
+                List<Playlist> row = new ArrayList<>(own);
+                row.add(0, com.eddyizm.tempus.stupify.StupifyHome.likedPlaylist());
+                showPlaylists.accept(row);
+            });
         });
 
+        if (stupify) {
+            bind.pinnedPlaylistsRecyclerView.setPadding((int) (16 * getResources().getDisplayMetrics().density), 0, 0, 0);
+            return;
+        }
         SnapHelper pinnedPlaylistsSnapHelper = new PagerSnapHelper();
         pinnedPlaylistsSnapHelper.attachToRecyclerView(bind.pinnedPlaylistsRecyclerView);
 
@@ -1484,11 +1506,20 @@ public class HomeTabMusicFragment extends Fragment implements ClickCallback {
 
     @Override
     public void onPlaylistClick(Bundle bundle) {
+        Playlist tapped = bundle.getParcelable(Constants.PLAYLIST_OBJECT);
+        if (tapped != null && com.eddyizm.tempus.stupify.StupifyHome.LIKED_ID.equals(tapped.getId())) {
+            Bundle starred = new Bundle();
+            starred.putString(Constants.MEDIA_STARRED, Constants.MEDIA_STARRED);
+            Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_songListPageFragment, starred);
+            return;
+        }
         Navigation.findNavController(requireView()).navigate(R.id.playlistPageFragment, bundle);
     }
 
     @Override
     public void onPlaylistLongClick(Bundle bundle) {
+        Playlist tapped = bundle.getParcelable(Constants.PLAYLIST_OBJECT);
+        if (tapped != null && com.eddyizm.tempus.stupify.StupifyHome.LIKED_ID.equals(tapped.getId())) return;
         Navigation.findNavController(requireView()).navigate(R.id.playlistRowBottomSheetDialog, bundle);
     }
 

@@ -226,10 +226,25 @@ public class HomeViewModel extends AndroidViewModel {
 
     public LiveData<List<AlbumID3>> getMostRecentlyAddedAlbums(LifecycleOwner owner) {
         if (recentlyAddedAlbumSample.getValue() == null) {
-            albumRepository.getAlbums("newest", 20, null, null).observe(owner, setIfCurrentGeneration(recentlyAddedAlbumSample));
+            loadRecentlyAddedAlbums(owner);
         }
 
         return recentlyAddedAlbumSample;
+    }
+
+    /** Stupify shows new releases by the artists the listener plays here (their Release Radar); the
+     *  server-wide "newest" list is whatever was downloaded last, for anyone, so it means nothing to them. */
+    private void loadRecentlyAddedAlbums(LifecycleOwner owner) {
+        if (com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild()) {
+            int generation = musicFolderGeneration;
+            new Thread(() -> {
+                List<AlbumID3> albums = com.eddyizm.tempus.stupify.StupifyHome.radarAlbums(
+                        com.eddyizm.tempus.stupify.StupifyHome.RADAR_ALBUMS);
+                if (generation == musicFolderGeneration) recentlyAddedAlbumSample.postValue(albums);
+            }).start();
+            return;
+        }
+        albumRepository.getAlbums("newest", 20, null, null).observe(owner, setIfCurrentGeneration(recentlyAddedAlbumSample));
     }
 
     public LiveData<List<AlbumID3>> getRecentlyPlayedAlbumList(LifecycleOwner owner) {
@@ -420,7 +435,7 @@ public class HomeViewModel extends AndroidViewModel {
     }
 
     public void refreshMostRecentlyAddedAlbums(LifecycleOwner owner) {
-        albumRepository.getAlbums("newest", 20, null, null).observe(owner, setIfCurrentGeneration(recentlyAddedAlbumSample));
+        loadRecentlyAddedAlbums(owner);
     }
 
     public void refreshRecentlyPlayedAlbumList(LifecycleOwner owner) {
@@ -452,6 +467,10 @@ public class HomeViewModel extends AndroidViewModel {
                 Preferences.setHomeSectorList(sectors);
             }
             if (sectors != null && com.eddyizm.tempus.stupify.StupifyHome.addSector(sectors, getApplication().getString(R.string.stupify_home_title))) {
+                Preferences.setHomeSectorList(sectors);
+            }
+            // Playlists sit at the very bottom of saved layouts; lift them to the top once (Stupify).
+            if (sectors != null && com.eddyizm.tempus.stupify.StupifyHome.liftPlaylists(sectors)) {
                 Preferences.setHomeSectorList(sectors);
             }
         }

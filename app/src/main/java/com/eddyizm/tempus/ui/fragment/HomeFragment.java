@@ -83,15 +83,24 @@ public class HomeFragment extends Fragment {
         appBarLayout.addView(tabLayout);
     }
 
+    // Stupify is music only: no Podcast or Radio tabs, whatever the saved settings say.
+    private static boolean podcastTab() {
+        return !com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild() && Preferences.isPodcastSectionVisible();
+    }
+
+    private static boolean radioTab() {
+        return !com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild() && Preferences.isRadioSectionVisible();
+    }
+
     private void initHomePager() {
         HomePager pager = new HomePager(this);
 
         pager.addFragment(new HomeTabMusicFragment(), getString(R.string.home_section_music), R.drawable.ic_home);
 
-        if (Preferences.isPodcastSectionVisible())
+        if (podcastTab())
             pager.addFragment(new HomeTabPodcastFragment(), getString(R.string.home_section_podcast), R.drawable.ic_graphic_eq);
 
-        if (Preferences.isRadioSectionVisible())
+        if (radioTab())
             pager.addFragment(new HomeTabRadioFragment(), getString(R.string.home_section_radio), R.drawable.ic_play_for_work);
 
         bind.homeViewPager.setAdapter(pager);
@@ -105,7 +114,7 @@ public class HomeFragment extends Fragment {
                 }
         ).attach();
 
-        tabLayout.setVisibility(Preferences.isPodcastSectionVisible() || Preferences.isRadioSectionVisible() ? View.VISIBLE : View.GONE);
+        tabLayout.setVisibility(podcastTab() || radioTab() ? View.VISIBLE : View.GONE);
 
         bind.homeViewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override

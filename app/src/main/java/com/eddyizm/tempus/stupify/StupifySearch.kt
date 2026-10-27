@@ -80,24 +80,7 @@ class StupifySearch(
         }
     }
 
-    private fun query(extra: Map<String, String>): String =
-        (App.getSubsonicClientInstance(false).params + extra).entries.joinToString("&") {
-            URLEncoder.encode(it.key, "UTF-8") + "=" + URLEncoder.encode(it.value, "UTF-8")
-        }
-
-    private fun get(path: String, extra: Map<String, String>): String {
-        val conn = URL("${BuildConfig.STUPIFY_SERVER}$path?${query(extra)}").openConnection() as HttpURLConnection
-        conn.connectTimeout = 8000
-        conn.readTimeout = 15000
-        try {
-            return conn.inputStream.bufferedReader().readText()
-        } finally {
-            conn.disconnect()
-        }
-    }
-
-    private fun fetch(query: String): SearchResult3 = gson.fromJson(
-        get("/app/v1/cloud", mapOf("q" to query)), SearchResult3::class.java)
+    private fun fetch(query: String): SearchResult3 = cloud(query)
 
     private fun played(song: Child) {
         if (states[song.id] == "ready") return
@@ -184,5 +167,28 @@ class StupifySearch(
             .registerTypeAdapter(Date::class.java, EmptyDateTypeAdapter())
             .setLenient()
             .create()
+
+        private fun query(extra: Map<String, String>): String =
+            (App.getSubsonicClientInstance(false).params + extra).entries.joinToString("&") {
+                URLEncoder.encode(it.key, "UTF-8") + "=" + URLEncoder.encode(it.value, "UTF-8")
+            }
+
+        private fun get(path: String, extra: Map<String, String>): String {
+            val conn = URL("${BuildConfig.STUPIFY_SERVER}$path?${query(extra)}").openConnection() as HttpURLConnection
+            conn.connectTimeout = 8000
+            conn.readTimeout = 15000
+            try {
+                return conn.inputStream.bufferedReader().readText()
+            } finally {
+                conn.disconnect()
+            }
+        }
+
+        /** The ☁ part of a search: songs and albums the library doesn't have. Blocking; call it off the
+         *  main thread. Shared with the TV, whose search was library-only and so found nothing at all
+         *  for anything not downloaded yet. */
+        @JvmStatic
+        fun cloud(query: String): SearchResult3 =
+            gson.fromJson(get("/app/v1/cloud", mapOf("q" to query)), SearchResult3::class.java)
     }
 }

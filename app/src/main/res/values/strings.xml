@@ -218,6 +218,7 @@
     <string name="home_title_most_played_see_all_button">See all</string>
     <string name="home_title_new_releases">New releases</string>
     <string name="home_title_newest_podcasts">Newest podcasts</string>
+    <string name="stupify_liked_subtitle">Your favourites</string>
     <string name="home_title_pinned_playlists">Playlists</string>
     <string name="home_title_podcast_channels">Channels</string>
     <string name="home_title_podcast_channels_see_all_button">See all</string>

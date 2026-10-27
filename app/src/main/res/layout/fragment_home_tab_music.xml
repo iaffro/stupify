@@ -14,6 +14,56 @@
         android:orientation="vertical"
         android:paddingBottom="@dimen/global_padding_bottom">
 
+        <!-- Playlists -->
+        <LinearLayout
+            android:id="@+id/pinned_playlists_sector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+                <!--  Label and button  -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="8dp">
+
+            <TextView
+                android:id="@+id/pinned_playlists_text_view"
+                style="@style/TitleLarge"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/home_title_pinned_playlists" />
+
+            <TextView
+                android:id="@+id/playlist_catalogue_text_view_clickable"
+                style="@style/TitleMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/library_title_playlist_see_all_button" />
+                </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/pinned_playlists_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:clipToPadding="false"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp" />
+        </LinearLayout>
+
         <!--  Stupify: Made for you  -->
         <include
             android:id="@+id/stupify_home"
@@ -938,55 +988,6 @@
                 android:paddingBottom="8dp" />
         </LinearLayout>
 
-        <!-- Playlists -->
-        <LinearLayout
-            android:id="@+id/pinned_playlists_sector"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-                <!--  Label and button  -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingStart="8dp"
-                android:paddingTop="16dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="8dp">
-
-            <TextView
-                android:id="@+id/pinned_playlists_text_view"
-                style="@style/TitleLarge"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="@string/home_title_pinned_playlists" />
-
-            <TextView
-                android:id="@+id/playlist_catalogue_text_view_clickable"
-                style="@style/TitleMedium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="@string/library_title_playlist_see_all_button" />
-                </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/pinned_playlists_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:clipToPadding="false"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
-        </LinearLayout>
 
         <!-- Shares -->
         <LinearLayout
