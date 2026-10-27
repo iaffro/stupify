@@ -14,6 +14,41 @@
     <string name="stupify_tv_next">Next</string>
     <string name="stupify_tv_play_pause">Play or pause</string>
     <string name="stupify_tv_nothing_playing">Nothing playing</string>
+    <string name="stupify_tv_play">Play</string>
+    <string name="stupify_tv_shuffle_on">Shuffle: on</string>
+    <string name="stupify_tv_shuffle_off">Shuffle: off</string>
+    <string name="stupify_tv_shuffled">Shuffle on \u00b7 songs you queued play first, in order</string>
+    <string name="stupify_tv_unshuffled">Shuffle off</string>
+    <string name="stupify_tv_shuffle">Shuffle</string>
+    <string name="stupify_tv_queue_short">Queue</string>
+    <string name="stupify_tv_add_to_queue">Add to queue</string>
+    <string name="stupify_tv_play_next">Play next</string>
+    <string name="stupify_tv_play_now">Play now</string>
+    <string name="stupify_tv_queue">Queue</string>
+    <string name="stupify_tv_like">Add to liked songs</string>
+    <string name="stupify_tv_unlike">Remove from liked songs</string>
+    <string name="stupify_tv_now_playing">Now playing</string>
+    <string name="stupify_tv_open_now_playing">Open Now Playing</string>
+    <string name="stupify_tv_more_hint">Hold OK on a song for more options</string>
+    <string name="stupify_tv_queue_hint">OK plays a song \u00b7 hold OK to move or remove it</string>
+    <string name="stupify_tv_go_playlist">Go to playlist</string>
+    <string name="stupify_tv_go_album">Go to album</string>
+    <string name="stupify_tv_go_artist">Go to artist</string>
+    <string name="stupify_tv_clear_upcoming">Clear upcoming</string>
+    <string name="stupify_tv_clear_confirm">Remove everything after the song that is playing?</string>
+    <string name="stupify_tv_yes">Remove</string>
+    <string name="stupify_tv_cancel">Cancel</string>
+    <string name="stupify_tv_move_up">Move up</string>
+    <string name="stupify_tv_move_down">Move down</string>
+    <string name="stupify_tv_remove">Remove from queue</string>
+    <string name="stupify_tv_added">Added to queue</string>
+    <string name="stupify_tv_playing_next">Playing next</string>
+    <string name="stupify_tv_liked">Added to liked songs</string>
+    <string name="stupify_tv_unliked">Removed from liked songs</string>
+    <string name="stupify_tv_like_failed">Couldn\'t update liked songs</string>
+    <string name="stupify_tv_cant_remove_playing">That song is playing now</string>
+    <string name="stupify_tv_queue_empty">Nothing in the queue</string>
+    <string name="stupify_tv_loading">Loading\u2026</string>
 
     <style name="StupifyTvTheme" parent="Theme.Leanback.Browse">
         <item name="android:windowBackground">@color/stupify_tv_background</item>
@@ -27,6 +62,38 @@
 
     <style name="StupifyTvPlayerTheme" parent="Theme.Leanback">
         <item name="android:windowBackground">@color/stupify_tv_background</item>
+    </style>
+
+    <style name="StupifyTvChip">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/stupify_tv_chip_text</item>
+        <item name="android:background">@drawable/stupify_tv_chip_bg</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="StupifyTvButtonSmall" parent="StupifyTvButton">
+        <item name="android:layout_width">72dp</item>
+        <item name="android:layout_height">72dp</item>
+        <item name="android:padding">18dp</item>
+    </style>
+
+    <style name="StupifyTvButtonCompact" parent="StupifyTvButton">
+        <item name="android:layout_width">64dp</item>
+        <item name="android:layout_height">64dp</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="StupifyTvMiniButton" parent="StupifyTvButton">
+        <item name="android:layout_width">56dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="android:padding">14dp</item>
     </style>
 
     <style name="StupifyTvButton">

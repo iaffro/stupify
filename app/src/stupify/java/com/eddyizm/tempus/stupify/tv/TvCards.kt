@@ -28,6 +28,11 @@ class TvCardPresenter : Presenter() {
         val it = item as StupifyTv.Item
         card.titleText = it.title
         card.contentText = it.subtitle
+        if (it is StupifyTv.Item.Liked) {
+            card.mainImageView.setImageResource(R.drawable.stupify_liked_cover)
+            card.setMainImageScaleType(ImageView.ScaleType.CENTER_CROP)
+            return
+        }
         if (it is StupifyTv.Item.Dj) {
             card.mainImageView.setImageResource(R.drawable.stupify_logo)
             card.setMainImageScaleType(ImageView.ScaleType.FIT_CENTER)

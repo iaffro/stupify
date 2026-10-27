@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A browse screen (home, search): its fragment above, the mini player bar below -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/stupify_tv_background"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/tv_screen_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <include layout="@layout/stupify_tv_mini_bar" />
+</LinearLayout>

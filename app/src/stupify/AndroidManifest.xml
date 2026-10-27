@@ -34,6 +34,16 @@
             android:exported="false"
             android:screenOrientation="landscape"
             android:theme="@style/StupifyTvPlayerTheme" />
+        <activity
+            android:name="com.eddyizm.tempus.stupify.tv.TvDetailActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/StupifyTvPlayerTheme" />
+        <activity
+            android:name="com.eddyizm.tempus.stupify.tv.TvQueueActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:theme="@style/StupifyTvPlayerTheme" />
 
         <activity android:name="com.eddyizm.tempus.ui.activity.MainActivity">
 

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The bar along the bottom of every browse screen while something is playing (TvMiniBar): what is playing,
+     its progress and prev / play-pause / next; OK on the song opens Now Playing -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_mini_bar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/stupify_tv_brand"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <ProgressBar
+        android:id="@+id/tv_mini_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:max="1000"
+        android:progressBackgroundTint="#33FFFFFF"
+        android:progressTint="@color/stupify_tv_accent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="48dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="48dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/tv_mini_open"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/stupify_tv_row_bg"
+            android:clickable="true"
+            android:contentDescription="@string/stupify_tv_open_now_playing"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/tv_mini_cover"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tv_mini_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/stupify_tv_text"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_mini_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/stupify_tv_text_dim"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/stupify_tv_now_playing"
+                android:textColor="@color/stupify_tv_accent"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/tv_mini_prev"
+            style="@style/StupifyTvMiniButton"
+            android:layout_marginStart="16dp"
+            android:contentDescription="@string/stupify_tv_previous"
+            android:src="@drawable/ic_skip_previous" />
+
+        <ImageButton
+            android:id="@+id/tv_mini_play"
+            style="@style/StupifyTvMiniButton"
+            android:layout_marginStart="12dp"
+            android:contentDescription="@string/stupify_tv_play_pause"
+            android:src="@drawable/ic_pause" />
+
+        <ImageButton
+            android:id="@+id/tv_mini_next"
+            style="@style/StupifyTvMiniButton"
+            android:layout_marginStart="12dp"
+            android:contentDescription="@string/stupify_tv_next"
+            android:src="@drawable/ic_skip_next" />
+    </LinearLayout>
+</LinearLayout>

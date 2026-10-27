@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The play queue (TvQueueActivity): jump to a song, move it, remove it, clear what is coming -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/stupify_tv_background"
+    android:orientation="vertical"
+    android:paddingStart="64dp"
+    android:paddingTop="32dp"
+    android:paddingEnd="64dp"
+    android:paddingBottom="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stupify_tv_queue"
+                android:textColor="@color/stupify_tv_text"
+                android:textSize="32sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_queue_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/stupify_tv_text_dim"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_queue_clear"
+            style="@style/StupifyTvChip"
+            android:layout_width="200dp"
+            android:layout_weight="0"
+            android:text="@string/stupify_tv_clear_upcoming" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="@string/stupify_tv_queue_hint"
+        android:textColor="@color/stupify_tv_text_dim"
+        android:textSize="14sp" />
+
+    <androidx.leanback.widget.VerticalGridView
+        android:id="@+id/tv_queue_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+                app:focusOutEnd="true"
+                app:focusOutFront="true" />
+</LinearLayout>

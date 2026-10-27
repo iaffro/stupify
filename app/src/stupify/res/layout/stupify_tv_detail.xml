@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A playlist, album or artist (TvDetailActivity): cover, title and Play / Shuffle / Queue on the left,
+     the songs on the right, the mini player bar along the bottom -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/stupify_tv_background"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:paddingStart="64dp"
+        android:paddingTop="32dp"
+        android:paddingEnd="64dp"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="340dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/tv_detail_cover"
+                android:layout_width="190dp"
+                android:layout_height="190dp"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop" />
+
+            <TextView
+                android:id="@+id/tv_detail_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/stupify_tv_text"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_detail_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/stupify_tv_text_dim"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_detail_count"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/stupify_tv_text_dim"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:id="@+id/tv_detail_play"
+                    style="@style/StupifyTvButtonSmall"
+                    android:contentDescription="@string/stupify_tv_play"
+                    android:src="@drawable/ic_play" />
+
+                <ImageButton
+                    android:id="@+id/tv_detail_shuffle"
+                    style="@style/StupifyTvButtonSmall"
+                    android:layout_marginStart="14dp"
+                    android:contentDescription="@string/stupify_tv_shuffle"
+                    android:src="@drawable/ic_shuffle" />
+
+                <ImageButton
+                    android:id="@+id/tv_detail_queue"
+                    style="@style/StupifyTvButtonSmall"
+                    android:layout_marginStart="14dp"
+                    android:contentDescription="@string/stupify_tv_add_to_queue"
+                    android:src="@drawable/ic_playlist_add" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="32dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_detail_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/stupify_tv_more_hint"
+                android:textColor="@color/stupify_tv_text_dim"
+                android:textSize="14sp" />
+
+            <androidx.leanback.widget.VerticalGridView
+                android:id="@+id/tv_detail_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                app:focusOutEnd="true"
+                app:focusOutFront="true" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <include layout="@layout/stupify_tv_mini_bar" />
+</LinearLayout>

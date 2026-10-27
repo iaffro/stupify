@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A focusable list row (tracks, queue, the mini player): lifted and outlined while focused -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_focused="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#2A4A7A" />
+            <stroke android:width="2dp" android:color="@color/stupify_tv_accent" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00000000" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+</selector>

@@ -6,20 +6,20 @@
     android:background="@color/stupify_tv_background"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="96dp"
-    android:paddingEnd="96dp">
+    android:paddingStart="64dp"
+    android:paddingEnd="64dp">
 
     <ImageView
         android:id="@+id/tv_player_cover"
-        android:layout_width="360dp"
-        android:layout_height="360dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:contentDescription="@null"
         android:scaleType="centerCrop" />
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="56dp"
+        android:layout_marginStart="40dp"
         android:layout_weight="1"
         android:orientation="vertical">
 
@@ -30,7 +30,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:textColor="@color/stupify_tv_text"
-            android:textSize="40sp"
+            android:textSize="36sp"
             android:textStyle="bold" />
 
         <TextView
@@ -57,7 +57,7 @@
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="6dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="24dp"
             android:max="1000"
             android:progressTint="@color/stupify_tv_accent" />
 
@@ -72,28 +72,58 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/tv_player_prev"
-                style="@style/StupifyTvButton"
+                style="@style/StupifyTvButtonCompact"
                 android:contentDescription="@string/stupify_tv_previous"
                 android:src="@drawable/ic_skip_previous" />
 
             <ImageButton
                 android:id="@+id/tv_player_play"
-                style="@style/StupifyTvButton"
-                android:layout_marginStart="24dp"
+                style="@style/StupifyTvButtonCompact"
+                android:layout_marginStart="14dp"
                 android:contentDescription="@string/stupify_tv_play_pause"
                 android:src="@drawable/ic_pause" />
 
             <ImageButton
                 android:id="@+id/tv_player_next"
-                style="@style/StupifyTvButton"
-                android:layout_marginStart="24dp"
+                style="@style/StupifyTvButtonCompact"
+                android:layout_marginStart="14dp"
                 android:contentDescription="@string/stupify_tv_next"
                 android:src="@drawable/ic_skip_next" />
+
+            <ImageButton
+                android:id="@+id/tv_player_shuffle"
+                style="@style/StupifyTvButtonCompact"
+                android:layout_marginStart="36dp"
+                android:contentDescription="@string/stupify_tv_shuffle_off"
+                android:src="@drawable/ic_shuffle" />
+
+            <ImageButton
+                android:id="@+id/tv_player_like"
+                style="@style/StupifyTvButtonCompact"
+                android:layout_marginStart="14dp"
+                android:contentDescription="@string/stupify_tv_like"
+                android:src="@drawable/ic_favorites_outlined" />
+
+            <ImageButton
+                android:id="@+id/tv_player_queue"
+                style="@style/StupifyTvButtonCompact"
+                android:layout_marginStart="14dp"
+                android:contentDescription="@string/stupify_tv_queue"
+                android:src="@drawable/ic_queue" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_player_source"
+            style="@style/StupifyTvChip"
+            android:layout_width="240dp"
+            android:layout_marginTop="14dp"
+            android:layout_weight="0"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>
