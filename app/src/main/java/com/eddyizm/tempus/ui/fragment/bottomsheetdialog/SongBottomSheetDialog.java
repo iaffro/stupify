@@ -191,6 +191,7 @@ public class SongBottomSheetDialog extends BottomSheetDialogFragment implements 
 
         TextView playNext = view.findViewById(R.id.play_next_text_view);
         playNext.setOnClickListener(v -> {
+            com.eddyizm.tempus.stupify.StupifySearch.prefetch(song.getId());
             MediaManager.enqueue(mediaBrowserListenableFuture, song, true);
             ((MainActivity) requireActivity()).setBottomSheetInPeek(true);
             dismissBottomSheet();
@@ -198,6 +199,7 @@ public class SongBottomSheetDialog extends BottomSheetDialogFragment implements 
 
         TextView addToQueue = view.findViewById(R.id.add_to_queue_text_view);
         addToQueue.setOnClickListener(v -> {
+            com.eddyizm.tempus.stupify.StupifySearch.prefetch(song.getId());
             MediaManager.enqueue(mediaBrowserListenableFuture, song, false);
             ((MainActivity) requireActivity()).setBottomSheetInPeek(true);
             dismissBottomSheet();

@@ -37,6 +37,8 @@
     <string name="stupify_cloud_title">☁ Not in your library yet</string>
     <string name="stupify_cloud_subtitle">Play one and Stupify adds it in seconds</string>
     <string name="stupify_cloud_none">Nothing more found outside your library</string>
+    <string name="stupify_cloud_add_to_queue">Add to queue</string>
+    <string name="stupify_cloud_queued">Added to queue — downloading</string>
     <string name="stupify_cloud_failed">Couldn\'t search outside your library right now</string>
     <string name="stupify_cloud_song_subtitle">☁ %1$s · %2$s</string>
     <string name="stupify_cloud_downloading">Adding to your library…</string>

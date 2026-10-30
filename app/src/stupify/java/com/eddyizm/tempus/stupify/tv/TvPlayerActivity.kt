@@ -25,7 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/** TV now playing: cover, song, progress, prev / play-pause / next, like, the queue, and a way back to where it came from. */
+/** TV now playing: cover, song, progress (left / right on it seek), prev / play-pause / next, like, the queue, and a way back to where it came from. */
 class TvPlayerActivity : FragmentActivity() {
     private lateinit var bind: StupifyTvPlayerBinding
     private lateinit var future: ListenableFuture<MediaBrowser>
@@ -66,7 +66,8 @@ class TvPlayerActivity : FragmentActivity() {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
             }
         }
-        bind.tvPlayerPlay.requestFocus()
+        StupifyTv.bindSeek(bind.tvPlayerProgress, bind.tvPlayerProgress, { player }) { showProgress() }
+        bind.tvPlayerProgress.requestFocus()  // left / right seek right away; down reaches the buttons
     }
 
     override fun onStart() {

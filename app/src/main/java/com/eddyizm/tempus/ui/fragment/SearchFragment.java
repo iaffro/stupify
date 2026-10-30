@@ -145,6 +145,7 @@ public class SearchFragment extends Fragment implements ClickCallback {
             stupifySearch = new com.eddyizm.tempus.stupify.StupifySearch(this, bind.stupifyCloud,
                     bundle -> { onMediaClick(bundle); return kotlin.Unit.INSTANCE; },
                     bundle -> { onMediaLongClick(bundle); return kotlin.Unit.INSTANCE; },
+                    song -> { MediaManager.enqueue(mediaBrowserListenableFuture, song, false); return kotlin.Unit.INSTANCE; },
                     albums -> { cloudAlbums = new java.util.ArrayList<>(albums); showAlbums(); return kotlin.Unit.INSTANCE; });
         }
     }

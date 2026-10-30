@@ -188,15 +188,14 @@ public class SongRepository {
                         List<Child> similar = extractSongs(response, "similarSongs2");
                         Log.d(TAG, "fetchSimilarByArtist.onResponse() - similar songs: " + similar.size());
 
-                        if (!similar.isEmpty()) {
-                            List<Child> limitedSimilar = similar.subList(0, Math.min(count, similar.size()));
-                            callback.onSongsAvailable(limitedSimilar);
-                        }
+                        // empty answers go through too: otherwise the mix never starts
+                        callback.onSongsAvailable(new ArrayList<>(similar.subList(0, Math.min(count, similar.size()))));
                     }
 
                     @Override
                     public void onFailure(@NonNull Call<ApiResponse> call, @NonNull Throwable t) {
                         Log.e(TAG, "fetchSimilarByArtist.onFailure()", t);
+                        callback.onSongsAvailable(new ArrayList<>());
                     }
                 });
     }
@@ -225,15 +224,16 @@ public class SongRepository {
             @Override
             public void onResponse(@NonNull Call<ApiResponse> call, @NonNull Response<ApiResponse> response) {
                 List<Child> songs = extractSongs(response, "similarSongs");
-                if (!songs.isEmpty()) {
-                    int limit = Math.min(count, songs.size());
-                    callback.onSongsAvailable(songs.subList(0, limit));
-                }
+                // always answer, even with nothing: the caller already holds the seed song, and staying
+                // silent left "creating mix" hanging until a second press
+                int limit = Math.min(count, songs.size());
+                callback.onSongsAvailable(new ArrayList<>(songs.subList(0, limit)));
             }
 
             @Override
             public void onFailure(@NonNull Call<ApiResponse> call, @NonNull Throwable t) {
                 Log.e(TAG, "fetchSimilarOnly.onFailure()", t);
+                callback.onSongsAvailable(new ArrayList<>());
             }
         });
     }

@@ -30,6 +30,7 @@
 
         <LinearLayout
             android:id="@+id/tv_mini_open"
+            android:nextFocusDown="@id/tv_mini_prev"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -86,6 +87,7 @@
 
         <ImageButton
             android:id="@+id/tv_mini_prev"
+            android:nextFocusUp="@id/tv_mini_open"
             style="@style/StupifyTvMiniButton"
             android:layout_marginStart="16dp"
             android:contentDescription="@string/stupify_tv_previous"
@@ -93,6 +95,7 @@
 
         <ImageButton
             android:id="@+id/tv_mini_play"
+            android:nextFocusUp="@id/tv_mini_open"
             style="@style/StupifyTvMiniButton"
             android:layout_marginStart="12dp"
             android:contentDescription="@string/stupify_tv_play_pause"
@@ -100,6 +103,7 @@
 
         <ImageButton
             android:id="@+id/tv_mini_next"
+            android:nextFocusUp="@id/tv_mini_open"
             style="@style/StupifyTvMiniButton"
             android:layout_marginStart="12dp"
             android:contentDescription="@string/stupify_tv_next"

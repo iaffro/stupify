@@ -125,7 +125,13 @@ object StupifyHome {
 
     /** Same list, each entry with the key the hub gave it ("mix1", "discover", "radar", "albums"). */
     @JvmStatic
-    fun loadKeyed(): List<Pair<String, Playlist>> {
+    fun loadKeyed(): List<Pair<String, Playlist>> = try {
+        fetchKeyed()
+    } catch (e: Exception) {  // offline, or the hub said no (e.g. right after signing in): no mixes, never a crash
+        emptyList()
+    }
+
+    private fun fetchKeyed(): List<Pair<String, Playlist>> {
         val client = App.getSubsonicClientInstance(false)
         val query = client.params.entries.joinToString("&") {
             URLEncoder.encode(it.key, "UTF-8") + "=" + URLEncoder.encode(it.value, "UTF-8")

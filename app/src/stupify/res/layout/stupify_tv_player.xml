@@ -54,6 +54,8 @@
 
         <ProgressBar
             android:id="@+id/tv_player_progress"
+            android:nextFocusDown="@id/tv_player_play"
+        android:focusable="true"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="6dp"

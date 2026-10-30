@@ -22,7 +22,8 @@ import com.google.common.util.concurrent.MoreExecutors
 
 /**
  * The bar along the bottom of a browse screen (layout stupify_tv_mini_bar): while something is playing it shows
- * what, how far along, and prev / play-pause / next; OK on the song opens Now Playing. It connects to the
+ * what, how far along, and prev / play-pause / next; OK on the song opens Now Playing; with the song focused, left / right skip back /
+ * forward in it (down reaches the buttons, up goes back to the song). It connects to the
  * playback service while its screen is on show, so every screen that includes the layout and creates one of
  * these gets the bar. `onSong` hears the id of the playing song whenever it changes (null: nothing playing).
  */
@@ -66,6 +67,8 @@ class TvMiniBar(
         activity.findViewById<View>(R.id.tv_mini_open).setOnClickListener { StupifyTv.openPlayer(activity, reuse = true) }
         activity.findViewById<View>(R.id.tv_mini_prev).setOnClickListener { player?.seekToPrevious() }
         activity.findViewById<View>(R.id.tv_mini_next).setOnClickListener { player?.seekToNext() }
+        val open = activity.findViewById<View>(R.id.tv_mini_open)
+        StupifyTv.bindSeek(open, progress, { player }) { showProgress() }
         play.setOnClickListener { player?.let { if (it.isPlaying) it.pause() else it.play() } }
     }
 

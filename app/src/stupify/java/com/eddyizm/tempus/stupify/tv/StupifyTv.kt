@@ -51,6 +51,29 @@ object StupifyTv {
     fun browser(context: Context): ListenableFuture<MediaBrowser> =
         MediaBrowser.Builder(context, SessionToken(context, ComponentName(context, MediaService::class.java))).buildAsync()
 
+    /** Makes a view a seek control: while it has focus, left / right skip back / forward in the playing song
+     *  (10 s a press, 30 s while the key is held). `bar` is the progress bar that grows while the view is focused,
+     *  so it is clear that left / right now seek. */
+    fun bindSeek(view: android.view.View, bar: android.widget.ProgressBar, player: () -> androidx.media3.common.Player?, onSeek: () -> Unit = {}) {
+        val density = bar.resources.displayMetrics.density
+        val rest = bar.layoutParams.height
+        view.isFocusable = true
+        view.setOnFocusChangeListener { _, focused ->
+            bar.layoutParams = bar.layoutParams.apply { height = if (focused) rest + (6 * density).toInt() else rest }
+        }
+        view.setOnKeyListener { _, keyCode, event ->
+            if (keyCode != android.view.KeyEvent.KEYCODE_DPAD_LEFT && keyCode != android.view.KeyEvent.KEYCODE_DPAD_RIGHT) return@setOnKeyListener false
+            val p = player() ?: return@setOnKeyListener true
+            if (event.action == android.view.KeyEvent.ACTION_DOWN && p.duration > 0) {
+                val step = if (event.repeatCount >= 4) 30_000L else 10_000L
+                val to = p.currentPosition + if (keyCode == android.view.KeyEvent.KEYCODE_DPAD_RIGHT) step else -step
+                p.seekTo(to.coerceIn(0L, p.duration))
+                onSeek()
+            }
+            true  // left / right stay put: up / down move on
+        }
+    }
+
     /** Keeps the TV awake while music plays: without this the screen goes dark and then the TV switches itself
      *  off after a few minutes, which is no good for listening in the background. Paused, the TV's own
      *  timeout applies again. */
@@ -102,6 +125,7 @@ object StupifyTv {
      *  by hand first, in the order they were queued. */
     fun enqueue(browser: ListenableFuture<MediaBrowser>, songs: List<Child>, next: Boolean) {
         if (songs.isEmpty()) return
+        songs.forEach { com.eddyizm.tempus.stupify.StupifySearch.prefetch(it.id) } // ☁ songs start downloading now
         browser.addListener({
             val b = runCatching { browser.get() }.getOrNull() ?: return@addListener
             if (b.mediaItemCount == 0) {

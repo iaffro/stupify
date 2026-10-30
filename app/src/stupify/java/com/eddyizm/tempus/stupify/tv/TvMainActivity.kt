@@ -61,7 +61,7 @@ class TvMainActivity : FragmentActivity() {
 
 /**
  * Leanback's row grids keep focus inside themselves at the bottom, so with the D-pad the mini player bar under
- * them could never be reached. DOWN on the last row now moves focus to the bar, and UP from the bar goes back
+ * them could never be reached. DOWN on the last row now moves focus to the bar, and UP from the bar's song goes back
  * to the rows. Returns true when it handled the key.
  */
 internal fun FragmentActivity.moveBetweenRowsAndBar(rows: RowsSupportFragment?, event: KeyEvent): Boolean {
@@ -85,7 +85,7 @@ internal fun FragmentActivity.moveBetweenRowsAndBar(rows: RowsSupportFragment?, 
             return true
         }
         KeyEvent.KEYCODE_DPAD_UP -> {
-            if (!inside(bar)) return false
+            if (focus.id != R.id.tv_mini_open) return false  // the bar's buttons go up to the song (nextFocusUp)
             return rows.view?.requestFocus() == true
         }
     }
