@@ -49,12 +49,12 @@
         android:visibility="gone" />
 
     <ImageButton
-        android:id="@+id/stupify_cloud_song_queue"
+        android:id="@+id/stupify_cloud_song_more"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_marginStart="4dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@string/stupify_cloud_add_to_queue"
-        android:src="@drawable/ic_playlist_add"
+        android:contentDescription="@string/stupify_cloud_more"
+        android:src="@drawable/ic_more_vert"
         app:tint="?attr/colorOnSurface" />
 </LinearLayout>

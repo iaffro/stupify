@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,7 +42,6 @@ class StupifySearch(
     private val bind: StupifySearchCloudBinding,
     private val onPlay: (Bundle) -> Unit,
     private val onLongClick: (Bundle) -> Unit,
-    private val onQueue: (Child) -> Unit,
     private val onCloudAlbums: (List<AlbumID3>) -> Unit,
 ) {
     private val adapter = SongAdapter()
@@ -153,13 +151,14 @@ class StupifySearch(
                     putInt(Constants.ITEM_POSITION, 0)
                 })
             }
-            holder.item.stupifyCloudSongQueue.setOnClickListener {
+            // the same 3-dot menu as a downloaded song: it is the long-press sheet
+            holder.item.stupifyCloudSongMore.setOnClickListener {
                 val pos = holder.bindingAdapterPosition
                 if (pos == RecyclerView.NO_POSITION) return@setOnClickListener
-                // queue it now and have the server start fetching, so it is there by the time it comes up
-                onQueue(songs[pos])
-                played(songs[pos])
-                Toast.makeText(ctx, R.string.stupify_cloud_queued, Toast.LENGTH_SHORT).show()
+                onLongClick(Bundle().apply {
+                    putParcelable(Constants.TRACK_OBJECT, songs[pos])
+                    putInt(Constants.ITEM_POSITION, pos)
+                })
             }
             holder.itemView.setOnLongClickListener {
                 val pos = holder.bindingAdapterPosition

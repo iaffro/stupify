@@ -18,7 +18,7 @@
     <string name="aa_starred_albums">★ Albums</string>
     <string name="aa_starred_artists">★ Artists</string>
     <string name="aa_starred_tracks">★ Tracks</string>
-    <string name="aa_instant_mix">Instant mix</string>
+    <string name="aa_instant_mix">Play song radio</string>
     <string name="aa_view_by_albums">View by albums</string>
     <string name="aa_tracks">Tracks</string>
     <string name="aa_quick_mix">Quick mix</string>
@@ -33,7 +33,7 @@
     <string name="album_bottom_sheet_add_to_queue">Add to queue</string>
     <string name="album_bottom_sheet_download_all">Download all</string>
     <string name="album_bottom_sheet_go_to_artist">Go to artist</string>
-    <string name="album_bottom_sheet_instant_mix">Instant mix</string>
+    <string name="album_bottom_sheet_instant_mix">Play album radio</string>
     <string name="album_bottom_sheet_play_next">Play next</string>
     <string name="album_bottom_sheet_remove_all">Remove all</string>
     <string name="album_bottom_sheet_share">Share</string>
@@ -56,7 +56,7 @@
     <string name="album_page_tracks_count_and_duration">%1$d songs  •  %2$d minutes</string>
     <string name="app_name">Tempus</string>
     <string name="artist_adapter_radio_station_starting">Searching…</string>
-    <string name="artist_bottom_sheet_instant_mix">Instant mix</string>
+    <string name="artist_bottom_sheet_instant_mix">Play artist radio</string>
     <string name="artist_bottom_sheet_shuffle">Shuffle</string>
     <string name="artist_bottom_sheet_play_next">Play next</string>
     <string name="artist_bottom_sheet_add_to_queue">Add to queue</string>
@@ -90,7 +90,7 @@
     <string name="battery_optimization_negative_button">Ignore</string>
     <string name="battery_optimization_neutral_button">Don\'t ask again</string>
     <string name="battery_optimization_positive_button">Disable</string>
-    <string name="bottom_sheet_generating_instant_mix">Generating instant mix...</string>
+    <string name="bottom_sheet_generating_instant_mix">Starting radio...</string>
     <string name="bottom_sheet_problem_generating_instant_mix">Could not retrieve tracks from subsonic server.</string>
     <string name="connection_alert_dialog_negative_button">Cancel</string>
     <string name="connection_alert_dialog_neutral_button">Enable data saver</string>
@@ -678,7 +678,7 @@
     <string name="song_bottom_sheet_error_retrieving_artist">Error retrieving artist</string>
     <string name="song_bottom_sheet_go_to_album">Go to album</string>
     <string name="song_bottom_sheet_go_to_artist">Go to artist</string>
-    <string name="song_bottom_sheet_instant_mix">Instant mix</string>
+    <string name="song_bottom_sheet_instant_mix">Play song radio</string>
     <string name="song_bottom_sheet_play_next">Play next</string>
     <string name="song_bottom_sheet_rate">Rate</string>
     <string name="song_bottom_sheet_remove">Remove from device</string>
