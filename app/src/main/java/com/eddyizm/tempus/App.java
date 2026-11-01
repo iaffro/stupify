@@ -58,6 +58,12 @@ public class App extends Application {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         ClientCertManager.setupSslSocketFactory(context);
+
+        // Stupify Connect: join the user's device list at the hub, and be a player other devices can use
+        if (com.eddyizm.tempus.stupify.StupifyUpdater.isStupifyBuild()) {
+            com.eddyizm.tempus.stupify.ConnectReceiver.INSTANCE.init(context);
+            com.eddyizm.tempus.stupify.ConnectHub.start(context);
+        }
     }
 
     public static App getInstance() {

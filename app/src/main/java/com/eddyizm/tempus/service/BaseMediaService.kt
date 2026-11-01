@@ -627,6 +627,7 @@ open class BaseMediaService : MediaLibraryService(), MediaManager.QueueTarget {
 
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 Log.d(TAG, "onIsPlayingChanged " + player.currentMediaItemIndex)
+                if (isPlaying) com.eddyizm.tempus.stupify.ConnectHub.claim()  // Stupify Connect: this is now the playing device
                 if (!isPlaying) {
                     MediaManager.setResumePoint(
                         player.currentMediaItem,

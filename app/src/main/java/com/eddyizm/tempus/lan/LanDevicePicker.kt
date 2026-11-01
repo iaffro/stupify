@@ -16,9 +16,11 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 object LanDevicePicker {
     /** Whether a way into [toggle] is shown. Kept while a session is live, so a switch turned off mid-session still leaves a way to end it. */
-    @JvmStatic fun isOffered(): Boolean = Preferences.isLanRemoteEnabled() || LanRemoteSession.isActive()
+    @JvmStatic fun isOffered(): Boolean = com.eddyizm.tempus.BuildConfig.STUPIFY_SERVER.isNotEmpty() || Preferences.isLanRemoteEnabled() || LanRemoteSession.isActive()
 
     @JvmStatic fun toggle(activity: FragmentActivity) {
+        // Stupify: devices come from the hub (Connect), not from the local network
+        if (com.eddyizm.tempus.BuildConfig.STUPIFY_SERVER.isNotEmpty()) { com.eddyizm.tempus.stupify.ConnectPicker.show(activity); return }
         if (LanRemoteSession.isActive()) { LanRemoteSession.disconnect(); return }
         // No discovery at all while the LAN remote switch is off.
         if (!Preferences.isLanRemoteEnabled()) return

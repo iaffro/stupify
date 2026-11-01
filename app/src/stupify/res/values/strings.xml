@@ -5,4 +5,8 @@
     <string name="home_title_recently_added">New releases for you</string>
     <string name="album_list_page_recently_added">New releases for you</string>
     <string name="stupify_tv_no_lyrics">No synced lyrics for this one</string>
+    <string name="lan_controlling">Playing on %1$s</string>
+    <string name="lan_play_on">Play on…</string>
+    <string name="lan_transferring">Moving your music…</string>
+    <string name="lan_reconnecting">Waiting for the device to come back…</string>
 </resources>

@@ -3,6 +3,9 @@
     <!-- in-app updates from stupify.iaffro.com (StupifyUpdater) -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- Stupify Connect: keep this device reachable (TV), start at boot, bring Now Playing up when someone plays on it -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <!-- Android TV: installable on TVs (no touchscreen), shown on the TV home screen with a banner -->
     <uses-feature
         android:name="android.software.leanback"
@@ -44,6 +47,20 @@
             android:exported="false"
             android:screenOrientation="landscape"
             android:theme="@style/StupifyTvPlayerTheme" />
+
+        <service
+            android:name="com.eddyizm.tempus.stupify.ConnectService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
+        <receiver
+            android:name="com.eddyizm.tempus.stupify.ConnectService$Boot"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
 
         <activity android:name="com.eddyizm.tempus.ui.activity.MainActivity">
 

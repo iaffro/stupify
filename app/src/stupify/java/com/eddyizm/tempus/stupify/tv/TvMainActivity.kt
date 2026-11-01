@@ -34,6 +34,7 @@ class TvMainActivity : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.eddyizm.tempus.stupify.ConnectService.start(this)  // Stupify Connect: stay reachable from the user's other devices
         if (!StupifyTv.signedIn()) {  // sign in on the normal screen, which comes back here (StupifyLogin)
             startActivity(Intent(this, MainActivity::class.java))
             finish()

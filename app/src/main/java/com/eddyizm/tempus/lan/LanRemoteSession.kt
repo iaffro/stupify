@@ -41,6 +41,11 @@ object LanRemoteSession {
     @Volatile private var stream: SSLSocket? = null
     @Volatile private var commandSocket: SSLSocket? = null
     private var task: Future<*>? = null
+    // Stupify Connect: the receiver is another of the user's devices, reached through the hub instead of a socket
+    @Volatile private var hubTarget: String? = null
+    private var hubWatch = 0L
+    private var hubEpoch = -1
+    private var hubObserver: androidx.lifecycle.Observer<List<com.eddyizm.tempus.stupify.ConnectHub.Device>>? = null
 
     @JvmStatic fun state(): LiveData<LanRemoteState> = updates
     @JvmStatic fun current(): LanRemoteState = updates.value ?: LanRemoteState()
@@ -61,6 +66,11 @@ object LanRemoteSession {
         LanRemoteVolume.release()
         generation++
         target = null; pin = null
+        hubObserver?.let { com.eddyizm.tempus.stupify.ConnectHub.devices().removeObserver(it) }; hubObserver = null
+        if (hubWatch != 0L) com.eddyizm.tempus.stupify.ConnectHub.forget(hubWatch); hubWatch = 0L
+        hubTarget?.let { id -> if (com.eddyizm.tempus.stupify.ConnectHub.isOnline(id))
+            com.eddyizm.tempus.stupify.ConnectHub.request(id, JSONObject().put("command", "unwatch"), 0) { } }
+        hubTarget = null; hubEpoch = -1
         runCatching { stream?.close() }; stream = null
         runCatching { commandSocket?.close() }; commandSocket = null
         task?.cancel(true); task = null
@@ -143,6 +153,79 @@ object LanRemoteSession {
         }
     }
 
+    /**
+     * Stupify Connect: make [deviceId] (another device of this user, online at the hub) the player. The queue and
+     * position playing here move over with it, this device goes quiet and becomes its remote control.
+     */
+    @JvmStatic fun connectHub(context: Context, deviceId: String, name: String) {
+        disconnect()
+        val app = context.applicationContext
+        appContext = app
+        hubTarget = deviceId
+        val token = generation
+        updates.value = LanRemoteState(active = true, name = name)
+        val observer = androidx.lifecycle.Observer<List<com.eddyizm.tempus.stupify.ConnectHub.Device>> { list ->
+            if (generation != token) return@Observer
+            val online = list.any { it.id == deviceId }
+            if (!online && current().connected) {
+                updates.value = current().copy(connected = false, error = R.string.lan_reconnecting); LanRemoteVolume.release()
+            } else if (online && com.eddyizm.tempus.stupify.ConnectHub.epoch != hubEpoch) hubSubscribe(app, token)
+        }
+        hubObserver = observer
+        com.eddyizm.tempus.stupify.ConnectHub.devices().observeForever(observer)
+        // take what is playing here along, then start following the receiver
+        val future = MediaBrowser.Builder(app, SessionToken(app, ComponentName(app, MediaService::class.java))).buildAsync()
+        future.addListener({
+            try {
+                val local = future.get()
+                if (generation != token) return@addListener
+                if (local.mediaItemCount > 0) {
+                    val first = local.currentMediaItemIndex
+                    val last = minOf(local.mediaItemCount, first + 300)
+                    val ids = (first until last).map { local.getMediaItemAt(it).mediaId }
+                    val body = JSONObject().put("command", "edit").put("action", "replace").put("ids", JSONArray(ids))
+                        .put("index", 0).put("position", local.currentPosition.coerceAtLeast(0)).put("play", local.playWhenReady)
+                    local.pause()
+                    notify(R.string.lan_transferring)
+                    request(body, { if (generation == token) disconnect() }) { if (generation == token) hubSubscribe(app, token) }
+                } else hubSubscribe(app, token)
+            } catch (e: Exception) { LanDiagnostics.record("Connect transfer failed", e); if (generation == token) disconnect() }
+            finally { MediaBrowser.releaseFuture(future) }
+        }, { main.post(it) })
+    }
+
+    private fun hubSubscribe(app: Context, token: Long) {
+        val id = hubTarget ?: return
+        hubEpoch = com.eddyizm.tempus.stupify.ConnectHub.epoch
+        if (hubWatch != 0L) com.eddyizm.tempus.stupify.ConnectHub.forget(hubWatch)
+        hubWatch = com.eddyizm.tempus.stupify.ConnectHub.request(id, JSONObject().put("command", "watch"), 0) { json ->
+            if (json.has("error")) { main.post { if (generation == token) {
+                updates.value = current().copy(connected = false, error = R.string.lan_reconnecting); hubEpoch = -1 } }; return@request }
+            val state = decode(json)
+            main.post { if (generation == token) {
+                updates.value = state
+                LanRemoteVolume.update(app, state)
+                refreshQueue()
+            } }
+        }
+    }
+
+    /** "Play on this device": bring what the receiver is playing back here (queue, song and position) and let it go quiet. */
+    @JvmStatic fun pullBack(context: Context) {
+        if (!isActive()) return
+        val app = context.applicationContext
+        val st = current()
+        val items = queueItems()
+        val ready = hubTarget != null && st.connected && queueIsCurrent() && items.isNotEmpty() && st.index in items.indices
+        val index = st.index
+        val pos = st.positionAt(SystemClock.elapsedRealtime())
+        if (ready) command("pause")
+        disconnect()
+        if (!ready) return
+        com.eddyizm.tempus.service.MediaManager.startQueue(
+            MediaBrowser.Builder(app, SessionToken(app, ComponentName(app, MediaService::class.java))).buildAsync(), items, index, pos)
+    }
+
     private fun decode(json: JSONObject) = LanRemoteState(
         active = true, connected = true, name = json.optString("name"), title = json.optString("title"),
         artist = json.optString("artist"), album = json.optString("album"), coverId = json.optString("cover"),
@@ -220,6 +303,20 @@ object LanRemoteSession {
 
     private fun request(body: JSONObject, failure: () -> Unit = {}, success: (JSONObject) -> Unit) {
         val token = generation
+        hubTarget?.let { id ->
+            com.eddyizm.tempus.stupify.ConnectHub.request(id, body, if (body.optString("command") == "edit") 120000 else 15000) { json ->
+                main.post {
+                    if (generation != token) return@post
+                    val err = json.optString("error")
+                    if (err.isEmpty() && json.optBoolean("ok")) { success(json); return@post }
+                    val message = if (err == "queue_changed") R.string.lan_queue_changed else R.string.lan_connection_error
+                    updates.value = current().copy(error = message)
+                    if (body.optString("command") != "queue_state") notify(message)
+                    failure()
+                }
+            }
+            return
+        }
         val info = target ?: return
         val expected = pin ?: return
         commands.execute {
