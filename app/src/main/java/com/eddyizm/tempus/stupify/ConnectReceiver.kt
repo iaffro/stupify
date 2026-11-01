@@ -51,8 +51,33 @@ object ConnectReceiver {
         ConnectHub.onDevices = {
             val online = ConnectHub.devices().value.orEmpty().map { it.id }.toSet()
             watchers.keys.removeAll { it !in online }
+            maybeAttach()
         }
         main.post { player() }
+    }
+
+    // ---- auto-attach: opening the app while another of your devices is playing makes this one its remote ----
+    private var letGoOf: String? = null      // a device the user stepped away from on purpose: don't snap back to it
+    private var probing = false
+    fun letGo(deviceId: String) { letGoOf = deviceId }
+
+    private fun maybeAttach() {
+        val ctx = appContext ?: return
+        if (probing || ConnectHub.isTv(ctx) || com.eddyizm.tempus.lan.LanRemoteSession.isActive()) return
+        if (ConnectHub.activeId != letGoOf) letGoOf = null   // the playing device changed: the old "let go" no longer applies
+        val active = ConnectHub.devices().value.orEmpty().firstOrNull { it.active && !it.self } ?: return
+        if (active.id == letGoOf) return
+        if (player()?.isPlaying == true) return    // playing here: this device stays the player
+        probing = true
+        ConnectHub.request(active.id, JSONObject().put("command", "status"), 6000) { json ->
+            main.post {
+                probing = false
+                val still = ConnectHub.devices().value.orEmpty().firstOrNull { it.id == active.id }
+                if (json.optBoolean("ok") && json.optBoolean("playing") && still != null &&
+                    !com.eddyizm.tempus.lan.LanRemoteSession.isActive() && player()?.isPlaying != true)
+                    com.eddyizm.tempus.lan.LanRemoteSession.connectHub(ctx, active.id, active.name, transfer = false)
+            }
+        }
     }
 
     private fun player(): MediaBrowser? {

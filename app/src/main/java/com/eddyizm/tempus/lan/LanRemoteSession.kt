@@ -63,6 +63,7 @@ object LanRemoteSession {
 
     @JvmStatic fun disconnect() {
         check(Looper.myLooper() == Looper.getMainLooper())
+        if (hubTarget != null) com.eddyizm.tempus.stupify.ConnectReceiver.letGo(hubTarget!!)
         LanRemoteVolume.release()
         generation++
         target = null; pin = null
@@ -157,7 +158,7 @@ object LanRemoteSession {
      * Stupify Connect: make [deviceId] (another device of this user, online at the hub) the player. The queue and
      * position playing here move over with it, this device goes quiet and becomes its remote control.
      */
-    @JvmStatic fun connectHub(context: Context, deviceId: String, name: String) {
+    @JvmStatic @JvmOverloads fun connectHub(context: Context, deviceId: String, name: String, transfer: Boolean = true) {
         disconnect()
         val app = context.applicationContext
         appContext = app
@@ -169,6 +170,8 @@ object LanRemoteSession {
             val online = list.any { it.id == deviceId }
             if (!online && current().connected) {
                 updates.value = current().copy(connected = false, error = R.string.lan_reconnecting); LanRemoteVolume.release()
+                // a device that stays gone is not worth waiting for: let go after a minute
+                main.postDelayed({ if (generation == token && hubTarget == deviceId && !com.eddyizm.tempus.stupify.ConnectHub.isOnline(deviceId)) disconnect() }, 60000)
             } else if (online && com.eddyizm.tempus.stupify.ConnectHub.epoch != hubEpoch) hubSubscribe(app, token)
         }
         hubObserver = observer
@@ -179,7 +182,7 @@ object LanRemoteSession {
             try {
                 val local = future.get()
                 if (generation != token) return@addListener
-                if (local.mediaItemCount > 0) {
+                if (transfer && local.mediaItemCount > 0) {
                     val first = local.currentMediaItemIndex
                     val last = minOf(local.mediaItemCount, first + 300)
                     val ids = (first until last).map { local.getMediaItemAt(it).mediaId }
