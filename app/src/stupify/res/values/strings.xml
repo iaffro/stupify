@@ -4,4 +4,5 @@
          by the artists this listener actually plays (StupifyHome.radarAlbums). -->
     <string name="home_title_recently_added">New releases for you</string>
     <string name="album_list_page_recently_added">New releases for you</string>
+    <string name="stupify_tv_no_lyrics">No synced lyrics for this one</string>
 </resources>

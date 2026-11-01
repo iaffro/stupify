@@ -2,11 +2,21 @@ package com.eddyizm.tempus.stupify.tv
 
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.animation.ValueAnimator
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.KeyEvent
+import android.view.Gravity
 import android.view.View
+import android.widget.TextView
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.eddyizm.tempus.stupify.StupifyLyrics
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -25,6 +35,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private const val LYRIC_ROWS = 7
+
 /** TV now playing: cover, song, progress (left / right on it seek), prev / play-pause / next, like, the queue, and a way back to where it came from. */
 class TvPlayerActivity : FragmentActivity() {
     private lateinit var bind: StupifyTvPlayerBinding
@@ -34,12 +46,19 @@ class TvPlayerActivity : FragmentActivity() {
     private var shownId: String? = null
     private var likeFor: String? = null  // the song the heart below is showing the state of
     private var liked = false
+    private var lyrics: List<StupifyLyrics.Line> = emptyList()
+    private var lyricsFor: String? = null
+    private var lyricNow = -2
+    private var lyricsDone = false  // the hub has answered (so "no lyrics" is true, not just "not yet")
+    private val lyricViews = ArrayList<TextView>()
+    private var bgColor = 0xFF070D1A.toInt()
     private val tick = object : Runnable {
         override fun run() {
             // the queue is often set a moment after this screen connects: catch the song change here too
             if (player?.currentMediaItem?.mediaId != shownId) showSong()
             showProgress()
-            ticker.postDelayed(this, 500)
+            showLyric()
+            ticker.postDelayed(this, 250)
         }
     }
     private val listener = object : Player.Listener {
@@ -66,6 +85,13 @@ class TvPlayerActivity : FragmentActivity() {
                     .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
             }
         }
+        for (i in 0 until LYRIC_ROWS) lyricViews.add(TextView(this).apply {
+            gravity = Gravity.START
+            setTextColor(ContextCompat.getColor(this@TvPlayerActivity, R.color.stupify_tv_text))
+            setPadding(0, 6, 0, 6)
+            maxLines = 3
+            bind.tvPlayerLyrics.addView(this, android.widget.LinearLayout.LayoutParams(-1, -2))
+        })
         StupifyTv.bindSeek(bind.tvPlayerProgress, bind.tvPlayerProgress, { player }) { showProgress() }
         bind.tvPlayerProgress.requestFocus()  // left / right seek right away; down reaches the buttons
     }
@@ -112,6 +138,8 @@ class TvPlayerActivity : FragmentActivity() {
             bind.tvPlayerArtist.text = p.mediaMetadata.title ?: ""
             bind.tvPlayerAlbum.text = ""
             bind.tvPlayerCover.setImageResource(R.drawable.stupify_logo)
+            setLyrics(null, emptyList(), false)
+            tint(0xFF070D1A.toInt())
             refreshLike()
             return
         }
@@ -120,9 +148,81 @@ class TvPlayerActivity : FragmentActivity() {
         bind.tvPlayerArtist.text = m.artist ?: ""
         bind.tvPlayerAlbum.text = m.albumTitle ?: ""
         val art = m.artworkUri
-        if (art != null) Glide.with(this).load(art).into(bind.tvPlayerCover)
-        else bind.tvPlayerCover.setImageResource(R.drawable.stupify_logo)
+        if (art != null) {
+            Glide.with(this).load(art).into(bind.tvPlayerCover)
+            Glide.with(this).asBitmap().load(art).override(48, 48).into(object : CustomTarget<Bitmap>() {  // the glow takes the cover's colour
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) = tint(dominant(resource))
+                override fun onLoadCleared(placeholder: android.graphics.drawable.Drawable?) {}
+            })
+        } else {
+            bind.tvPlayerCover.setImageResource(R.drawable.stupify_logo)
+            tint(0xFF070D1A.toInt())
+        }
+        loadLyrics(p.currentMediaItem?.mediaId, m.artist?.toString().orEmpty(), m.title?.toString().orEmpty(), m.albumTitle?.toString().orEmpty(), (p.duration / 1000).toInt().coerceAtLeast(0))
         refreshLike()
+    }
+
+    /** The most vivid colour of the cover, darkened so white text stays readable on it. */
+    private fun dominant(b: Bitmap): Int {
+        var best = 0xFF070D1A.toInt(); var bestSat = -1f
+        val hsv = FloatArray(3)
+        for (x in 0 until b.width step 2) for (y in 0 until b.height step 2) {
+            Color.colorToHSV(b.getPixel(x, y), hsv)
+            val score = hsv[1] * hsv[2] * (if (hsv[2] < 0.2f) 0.2f else 1f)
+            if (score > bestSat) { bestSat = score; best = b.getPixel(x, y) }
+        }
+        Color.colorToHSV(best, hsv)
+        hsv[2] = hsv[2].coerceIn(0.28f, 0.55f); hsv[1] = hsv[1].coerceAtMost(0.85f)
+        return Color.HSVToColor(hsv)
+    }
+
+    /** Fades the whole screen's background to a glow of [color] over the dark base. */
+    private fun tint(color: Int) {
+        val from = bgColor; bgColor = color
+        ValueAnimator.ofObject(android.animation.ArgbEvaluator(), from, color).setDuration(900).apply {
+            addUpdateListener {
+                bind.tvPlayerRoot.background = GradientDrawable(GradientDrawable.Orientation.TL_BR,
+                    intArrayOf(it.animatedValue as Int, 0xFF070D1A.toInt()))
+            }
+            start()
+        }
+    }
+
+    private fun loadLyrics(id: String?, artist: String, title: String, album: String, secs: Int) {
+        if (id == null || id == lyricsFor || title.isEmpty()) return
+        setLyrics(id, emptyList())
+        lifecycleScope.launch {
+            val lines = withContext(Dispatchers.IO) { StupifyLyrics.fetch(artist, title, album, secs) }
+            if (lyricsFor == id) setLyrics(id, lines, true)
+        }
+    }
+
+    private fun setLyrics(id: String?, lines: List<StupifyLyrics.Line>, done: Boolean = false) {
+        lyricsFor = id; lyricsDone = done; lyrics = lines; lyricNow = -2
+        showLyric()
+    }
+
+    /** A teleprompter: the line being sung big and bright in the middle, two before and after it fading away. */
+    private fun showLyric() {
+        val pos = player?.currentPosition ?: 0L
+        var now = -1
+        for (i in lyrics.indices) { if (lyrics[i].startMs <= pos + 250) now = i else break }
+        if (lyrics.isEmpty()) now = -1
+        if (now == lyricNow) return
+        lyricNow = now
+        val mid = LYRIC_ROWS / 2
+        val accent = ContextCompat.getColor(this, R.color.stupify_tv_text)
+        lyricViews.forEachIndexed { row, tv ->
+            val i = now - mid + row
+            val line = if (lyrics.isEmpty()) (if (row == mid && lyricsDone) getString(R.string.stupify_tv_no_lyrics) else "") else lyrics.getOrNull(i)?.text?.ifBlank { "♪" }.orEmpty()
+            tv.text = line
+            val d = Math.abs(row - mid)
+            val sung = lyrics.isNotEmpty() && i == now
+            tv.textSize = if (sung) 30f else if (lyrics.isEmpty()) 18f else 20f
+            tv.setTypeface(null, if (sung) Typeface.BOLD else Typeface.NORMAL)
+            tv.setTextColor(accent)
+            tv.animate().alpha(if (lyrics.isEmpty()) 0.6f else if (sung) 1f else (0.5f - 0.17f * (d - 1)).coerceAtLeast(0.12f)).setDuration(250).start()
+        }
     }
 
     /** The heart and the "go to playlist" link follow the song that is playing. */
