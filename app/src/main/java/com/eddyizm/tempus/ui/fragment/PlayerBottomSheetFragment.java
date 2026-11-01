@@ -305,9 +305,36 @@ public class PlayerBottomSheetFragment extends Fragment {
                         .build()
                         .into(bind.playerHeaderLayout.playerHeaderMediaCoverImage);
             }
+            if (!Constants.MEDIA_TYPE_RADIO.equals(mediaMetadata.extras.getString("type"))) glowFrom(mediaMetadata.artworkUri);
         }
     }
 
+
+    private int glowColor = 0;
+
+    /** Stupify: the player's background takes a soft glow of the cover's colour (faded in, theme-aware). */
+    private void glowFrom(android.net.Uri artwork) {
+        if (bind == null || artwork == null || !isAdded()) return;
+        final int surface = com.google.android.material.color.MaterialColors.getColor(bind.getRoot(), com.google.android.material.R.attr.colorSurface);
+        Glide.with(requireContext()).asBitmap().load(artwork).override(48, 48).into(new com.bumptech.glide.request.target.CustomTarget<android.graphics.Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull android.graphics.Bitmap resource, @Nullable com.bumptech.glide.request.transition.Transition<? super android.graphics.Bitmap> t) {
+                if (bind == null) return;
+                final int to = com.eddyizm.tempus.stupify.StupifyLyrics.glow(resource, surface);
+                final int from = glowColor == 0 ? surface : glowColor;
+                glowColor = to;
+                android.animation.ValueAnimator a = android.animation.ValueAnimator.ofObject(new android.animation.ArgbEvaluator(), from, to).setDuration(800);
+                a.addUpdateListener(v -> {
+                    if (bind != null) bind.playerBodyLayout.playerBodyRoot.setBackground(new android.graphics.drawable.GradientDrawable(
+                            android.graphics.drawable.GradientDrawable.Orientation.TOP_BOTTOM, new int[]{(Integer) v.getAnimatedValue(), surface}));
+                });
+                a.start();
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable android.graphics.drawable.Drawable placeholder) {}
+        });
+    }
 
     private void setMediaControllerUI(MediaBrowser mediaBrowser) {
         if (com.eddyizm.tempus.lan.LanRemoteSession.isActive() || bind == null) return;

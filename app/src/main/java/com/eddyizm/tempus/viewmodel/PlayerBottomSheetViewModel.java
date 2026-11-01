@@ -184,6 +184,7 @@ public class PlayerBottomSheetViewModel extends AndroidViewModel {
                 if (shouldAutoDownloadLyrics() && hasStructuredLyrics(lyricsList)) {
                     saveLyricsToCache(media, null, lyricsList);
                 }
+                if (!hasSyncedLyrics(lyricsList)) hubLyrics(media);
             });
         } else {
             songRepository.getSongLyrics(media).observe(owner, lyrics -> {
@@ -193,6 +194,7 @@ public class PlayerBottomSheetViewModel extends AndroidViewModel {
                 if (shouldAutoDownloadLyrics() && !TextUtils.isEmpty(lyrics)) {
                     saveLyricsToCache(media, lyrics, null);
                 }
+                hubLyrics(media);
             });
         }
     }
@@ -371,6 +373,26 @@ public class PlayerBottomSheetViewModel extends AndroidViewModel {
 
         lyricsRepository.insert(lyricsCache);
         lyricsCachedLiveData.postValue(true);
+    }
+
+    private boolean hasSyncedLyrics(LyricsList lyricsList) {
+        return hasStructuredLyrics(lyricsList) && lyricsList.getStructuredLyrics().get(0).getSynced();
+    }
+
+    /** Stupify: when the server has no time-synced lyrics for the song, ask the hub (LRCLIB) and show those. */
+    private void hubLyrics(Child media) {
+        if (media == null || media.getId() == null || TextUtils.isEmpty(media.getTitle())) return;
+        final String id = media.getId();
+        new Thread(() -> {
+            java.util.List<com.eddyizm.tempus.stupify.StupifyLyrics.Line> lines = com.eddyizm.tempus.stupify.StupifyLyrics.fetch(
+                    media.getArtist() == null ? "" : media.getArtist(), media.getTitle(),
+                    media.getAlbum() == null ? "" : media.getAlbum(), media.getDuration() == null ? 0 : media.getDuration());
+            if (lines.isEmpty() || !id.equals(currentSongId)) return;
+            LyricsList list = com.eddyizm.tempus.stupify.StupifyLyrics.asLyricsList(lines, media.getArtist(), media.getTitle());
+            lyricsListLiveData.postValue(list);
+            lyricsLiveData.postValue(null);
+            if (shouldAutoDownloadLyrics()) saveLyricsToCache(media, null, list);
+        }, "stupify-lyrics").start();
     }
 
     private boolean hasStructuredLyrics(LyricsList lyricsList) {
