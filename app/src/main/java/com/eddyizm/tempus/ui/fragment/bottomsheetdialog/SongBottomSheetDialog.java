@@ -160,32 +160,18 @@ public class SongBottomSheetDialog extends BottomSheetDialogFragment implements 
             MainActivity activity = (MainActivity) getActivity();
             if (activity == null) return;
 
-            ListenableFuture<MediaBrowser> activityBrowserFuture = activity.getMediaBrowserListenableFuture();
-            if (activityBrowserFuture == null) {
-                Log.e(TAG, "MediaBrowser Future is null in MainActivity");
-                return;
-            }
-
+            // Song radio: build the mix into a playlist and open its page, so the listener decides whether
+            // to play it, or which song to start from (it no longer starts playing by itself).
             isFirstBatch = true;
             Toast.makeText(requireContext(), R.string.bottom_sheet_generating_instant_mix, Toast.LENGTH_SHORT).show();
 
             songBottomSheetViewModel.getInstantMix(activity, song).observe(activity, media -> {
-
-                if (media == null || media.isEmpty()) return;
-                if (getActivity() == null) return;
-
+                if (media == null || media.isEmpty() || !isFirstBatch) return;
+                isFirstBatch = false;
                 MusicUtil.ratingFilter(media);
-
-                if (isFirstBatch) {
-                    isFirstBatch = false;
-                    MediaManager.startQueue(activityBrowserFuture, media, 0);
-                    activity.setBottomSheetInPeek(true);
-                    if (isAdded()) {
-                        dismissBottomSheet();
-                    }
-                } else {
-                    MediaManager.enqueue(activityBrowserFuture, media, true);
-                }
+                String title = song.getTitle() != null ? song.getTitle() : "";
+                com.eddyizm.tempus.stupify.StupifyRadio.create(activity, getString(R.string.stupify_radio_playlist_name, title), media);
+                if (isAdded()) dismissBottomSheet();
             });
         });
 
